@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-50: oklch(97% 0.02 250);
+  --color-brand-100: oklch(93% 0.05 250);
+  --color-brand-200: oklch(86% 0.09 250);
+  --color-brand-300: oklch(76% 0.13 250);
+  --color-brand-400: oklch(64% 0.17 250);
+  --color-brand-500: oklch(54% 0.20 250);
+  --color-brand-600: oklch(46% 0.20 250);
+  --color-brand-700: oklch(38% 0.18 250);
+  --color-brand-800: oklch(30% 0.14 250);
+  --color-brand-900: oklch(22% 0.10 250);
+
+  --color-gain-400: oklch(72% 0.17 145);
+  --color-gain-500: oklch(62% 0.19 145);
+  --color-gain-600: oklch(52% 0.18 145);
+
+  --color-loss-400: oklch(65% 0.20 25);
+  --color-loss-500: oklch(55% 0.22 25);
+  --color-loss-600: oklch(45% 0.20 25);
+
+  --color-surface-50: oklch(98% 0.005 250);
+  --color-surface-100: oklch(95% 0.008 250);
+  --color-surface-800: oklch(20% 0.015 250);
+  --color-surface-900: oklch(13% 0.012 250);
+  --color-surface-950: oklch(9% 0.010 250);
+
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-mono: "DM Mono", "Fira Code", monospace;
+  --font-display: "Syne", system-ui, sans-serif;
+}
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-surface-950 text-surface-50 font-sans;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500 rounded-sm;
+  }
+}
