@@ -68,9 +68,6 @@ export default function Alerts() {
     );
   }
 
-  // Active = not triggered, and active field is true
-  // Paused = not triggered, but active field is false
-  // Triggered = alert has fired
   const activeAlerts = alerts?.filter((a) => !a.triggered) ?? [];
   const triggeredAlerts = alerts?.filter((a) => a.triggered) ?? [];
 
@@ -163,10 +160,11 @@ export default function Alerts() {
                 />
                 {searching && (
                   <div
-                    className="w-3 h-3 rounded-full border border-t-transparent shrink-0 animate-spin"
+                    className="w-4 h-4 rounded-full border-2 border-t-transparent shrink-0 animate-spin"
                     style={{
-                      borderColor: "rgba(99,102,241,0.6)",
+                      borderColor: "rgba(99,102,241,0.5)",
                       borderTopColor: "transparent",
+                      marginRight: "2px",
                     }}
                   />
                 )}
@@ -177,10 +175,21 @@ export default function Alerts() {
                       setShowResults(false);
                     }}
                     aria-label="Clear symbol"
-                    className="shrink-0 focus-visible:outline-none rounded"
-                    style={{ color: "rgba(255,255,255,0.3)" }}
+                    className="shrink-0 w-5 h-5 flex items-center justify-center rounded-md focus-visible:outline-none transition-colors"
+                    style={{ color: "rgba(255,255,255,0.3)", marginRight: "2px" }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.color = "#fff";
+                      (e.currentTarget as HTMLButtonElement).style.background =
+                        "rgba(255,255,255,0.08)";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.color =
+                        "rgba(255,255,255,0.3)";
+                      (e.currentTarget as HTMLButtonElement).style.background =
+                        "transparent";
+                    }}
                   >
-                    <X size={13} strokeWidth={1.5} aria-hidden="true" />
+                    <X size={11} strokeWidth={2} aria-hidden="true" />
                   </button>
                 )}
               </div>
@@ -204,7 +213,9 @@ export default function Alerts() {
                       aria-selected={symbol === result.symbol}
                       onClick={() => handleSelectSymbol(result.symbol)}
                       className="w-full flex items-center gap-3 px-3 py-2.5 text-left transition-all focus-visible:outline-none"
-                      style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+                      style={{
+                        borderBottom: "1px solid rgba(255,255,255,0.05)",
+                      }}
                       onMouseEnter={(e) => {
                         (e.currentTarget as HTMLButtonElement).style.background =
                           "rgba(255,255,255,0.04)";
@@ -289,8 +300,14 @@ export default function Alerts() {
                   style={
                     condition === c
                       ? c === "ABOVE"
-                        ? { background: "rgba(16,185,129,0.15)", color: "#10b981" }
-                        : { background: "rgba(239,68,68,0.15)", color: "#ef4444" }
+                        ? {
+                            background: "rgba(16,185,129,0.15)",
+                            color: "#10b981",
+                          }
+                        : {
+                            background: "rgba(239,68,68,0.15)",
+                            color: "#ef4444",
+                          }
                       : { color: "rgba(255,255,255,0.35)" }
                   }
                 >
@@ -326,11 +343,13 @@ export default function Alerts() {
                 border: "1px solid rgba(255,255,255,0.08)",
               }}
               onFocus={(e) => {
-                e.currentTarget.style.border = "1px solid rgba(99,102,241,0.5)";
+                e.currentTarget.style.border =
+                  "1px solid rgba(99,102,241,0.5)";
                 e.currentTarget.style.background = "rgba(255,255,255,0.07)";
               }}
               onBlur={(e) => {
-                e.currentTarget.style.border = "1px solid rgba(255,255,255,0.08)";
+                e.currentTarget.style.border =
+                  "1px solid rgba(255,255,255,0.08)";
                 e.currentTarget.style.background = "rgba(255,255,255,0.05)";
               }}
             />
@@ -468,7 +487,9 @@ export default function Alerts() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => toggleAlert(alert._id)}
-                      aria-label={alert.active ? "Pause alert" : "Resume alert"}
+                      aria-label={
+                        alert.active ? "Pause alert" : "Resume alert"
+                      }
                       aria-pressed={alert.active}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                       style={
@@ -485,16 +506,26 @@ export default function Alerts() {
                             }
                       }
                       onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.opacity = "0.8";
+                        (e.currentTarget as HTMLButtonElement).style.opacity =
+                          "0.8";
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.opacity = "1";
+                        (e.currentTarget as HTMLButtonElement).style.opacity =
+                          "1";
                       }}
                     >
                       {alert.active ? (
-                        <ToggleRight size={14} strokeWidth={1.5} aria-hidden="true" />
+                        <ToggleRight
+                          size={14}
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                        />
                       ) : (
-                        <ToggleLeft size={14} strokeWidth={1.5} aria-hidden="true" />
+                        <ToggleLeft
+                          size={14}
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                        />
                       )}
                       {alert.active ? "Active" : "Paused"}
                     </button>
@@ -541,7 +572,10 @@ export default function Alerts() {
               Triggered
               <span
                 className="ml-2 px-2 py-0.5 rounded-full text-xs font-bold"
-                style={{ background: "rgba(16,185,129,0.1)", color: "#10b981" }}
+                style={{
+                  background: "rgba(16,185,129,0.1)",
+                  color: "#10b981",
+                }}
               >
                 {triggeredAlerts.length}
               </span>
@@ -586,7 +620,11 @@ export default function Alerts() {
                         color: "#10b981",
                       }}
                     >
-                      <CheckCircle2 size={17} strokeWidth={1.5} aria-hidden="true" />
+                      <CheckCircle2
+                        size={17}
+                        strokeWidth={1.5}
+                        aria-hidden="true"
+                      />
                     </div>
                     <div>
                       <div className="flex items-center gap-2 mb-0.5">
@@ -615,7 +653,10 @@ export default function Alerts() {
                           <span className="ml-2">
                             ·{" "}
                             <time dateTime={alert.notifiedAt}>
-                              {format(parseISO(alert.notifiedAt), "MMM d, yyyy")}
+                              {format(
+                                parseISO(alert.notifiedAt),
+                                "MMM d, yyyy"
+                              )}
                             </time>
                           </span>
                         )}
