@@ -104,7 +104,7 @@ export default function Alerts() {
           <h2 className="text-sm font-semibold text-white">New Alert</h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-3">
           {/* Symbol with search */}
           <div className="flex flex-col gap-1.5">
             <label
@@ -116,7 +116,7 @@ export default function Alerts() {
             </label>
             <div className="relative">
               <div
-                className="flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all"
+                className="flex items-center gap-2 px-2 py-2.5 rounded-xl transition-all"
                 style={{
                   background: "rgba(255,255,255,0.05)",
                   border: "1px solid rgba(255,255,255,0.08)",
@@ -164,7 +164,6 @@ export default function Alerts() {
                     style={{
                       borderColor: "rgba(99,102,241,0.5)",
                       borderTopColor: "transparent",
-                      marginRight: "2px",
                     }}
                   />
                 )}
@@ -189,7 +188,7 @@ export default function Alerts() {
                         "transparent";
                     }}
                   >
-                    <X size={11} strokeWidth={2} aria-hidden="true" />
+                    <X size={14} strokeWidth={2} aria-hidden="true" />
                   </button>
                 )}
               </div>

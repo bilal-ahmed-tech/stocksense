@@ -33,7 +33,7 @@ export default function AppLayout() {
       <SocketHandler />
       <div
         className="transition-all duration-300 pt-14 flex flex-col min-h-screen"
-        style={{ marginLeft: sidebarOpen ? 224 : 64 }}
+        style={{ marginLeft: sidebarOpen ? 224 : 0 }}
       >
         <main className="flex-1 p-2 sm:p-6">
           <Outlet />
