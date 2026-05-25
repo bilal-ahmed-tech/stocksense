@@ -4,6 +4,7 @@ import { TrendingUp, ArrowLeft } from "lucide-react";
 export default function NotFound() {
   return (
     <main className="min-h-screen bg-surface-950 flex items-center justify-center px-4">
+      <title>404 Not Found — StockSense</title>
       <div className="text-center space-y-6">
         <div className="flex items-center justify-center gap-2 mb-8">
           <TrendingUp

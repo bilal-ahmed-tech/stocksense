@@ -83,6 +83,7 @@ export default function Register() {
   return (
     <div className="min-h-screen flex" style={{ background: "#09090b" }}>
       {/* Left panel */}
+      <title>Get Started — StockSense</title>
       <div
         className="hidden lg:flex flex-col justify-between p-10 w-105 shrink-0"
         style={{
@@ -326,8 +327,7 @@ export default function Register() {
                   type="button"
                   onClick={() => setShowPassword((p) => !p)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-500 rounded"
-                  style={{ color: "rgba(255,255,255,0.3)" }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 focus-visible:outline-2 focus-visible:outline-offset-1 text-gray-200 focus-visible:outline-indigo-500 rounded"
                 >
                   {showPassword
                     ? <EyeOff size={15} strokeWidth={1.5} aria-hidden="true" />
