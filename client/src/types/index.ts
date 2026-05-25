@@ -75,7 +75,12 @@ export interface StockNewsItem {
   summary: string;
   source: string;
   publishedAt: string;
-  sentiment: "Bullish" | "Bearish" | "Neutral" | "Somewhat-Bullish" | "Somewhat-Bearish";
+  sentiment:
+    | "Bullish"
+    | "Bearish"
+    | "Neutral"
+    | "Somewhat-Bullish"
+    | "Somewhat-Bearish";
 }
 
 export interface StockSearchResult {
@@ -100,11 +105,11 @@ export interface Alert {
   symbol: string;
   condition: AlertCondition;
   targetPrice: number;
+  active: boolean;
   triggered: boolean;
   notifiedAt: string | null;
   createdAt: string;
 }
-
 export interface ApiSuccess<T> {
   success: true;
   data: T;
