@@ -13,32 +13,37 @@ const MOBILE_BREAKPOINT = 1024;
 
 function SocketHandler() {
   const queryClient = useQueryClient();
-  const onPriceUpdate = useCallback(
-    (_payload: PriceUpdatePayload) => {
-      queryClient.invalidateQueries({ queryKey: ["stock"] });
-    },
-    [queryClient]
-  );
+
+  const onPriceUpdate = useCallback((_payload: PriceUpdatePayload) => {
+    queryClient.invalidateQueries({ queryKey: ["stock"] });
+  }, [queryClient]);
+
   useSocket(onPriceUpdate);
   return null;
 }
 
 export default function AppLayout() {
   const sidebarOpen = useUIStore((s) => s.sidebarOpen);
+
   const [isMobile, setIsMobile] = useState(
     () => window.innerWidth < MOBILE_BREAKPOINT
   );
 
   useEffect(() => {
     function handleResize() {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+      const nextIsMobile = window.innerWidth < MOBILE_BREAKPOINT;
+
+      setIsMobile((prev) => {
+        if (prev === nextIsMobile) return prev;
+        return nextIsMobile;
+      });
     }
-    window.addEventListener("resize", handleResize);
+
+    window.addEventListener("resize", handleResize, { passive: true });
+
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // On mobile sidebar is always overlaid — no margin needed
-  // On desktop open=224, collapsed=64
   const marginLeft = isMobile ? 0 : sidebarOpen ? 224 : 64;
 
   return (
@@ -46,6 +51,7 @@ export default function AppLayout() {
       <Navbar />
       <Sidebar />
       <SocketHandler />
+
       <div
         className="flex flex-col min-h-screen pt-14 transition-all duration-300"
         style={{ marginLeft }}
@@ -55,6 +61,7 @@ export default function AppLayout() {
         </main>
         <Footer />
       </div>
+
       <TradeModal />
     </div>
   );

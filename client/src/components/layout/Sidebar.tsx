@@ -39,19 +39,27 @@ export default function Sidebar() {
   const prevIsMobile = useRef(isMobile);
 
   // Breakpoint detection
-  useEffect(() => {
-    function handleResize() {
-      const mobile = window.innerWidth < MOBILE_BREAKPOINT;
-      const crossed = mobile !== prevIsMobile.current;
-      if (crossed) {
-        prevIsMobile.current = mobile;
-        setIsMobile(mobile);
-        setSidebarOpen(false);
-      }
+ useEffect(() => {
+  function handleResize() {
+    const mobile = window.innerWidth < MOBILE_BREAKPOINT;
+
+    // update isMobile only if it actually changed
+    setIsMobile((prev) => {
+      if (prev === mobile) return prev;
+      return mobile;
+    });
+
+    // close sidebar ONLY when breakpoint actually changes
+    if (prevIsMobile.current !== mobile) {
+      prevIsMobile.current = mobile;
+      setSidebarOpen(false);
     }
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [setSidebarOpen]);
+  }
+
+  window.addEventListener("resize", handleResize, { passive: true });
+
+  return () => window.removeEventListener("resize", handleResize);
+}, [setSidebarOpen]);
 
   // Swipe to close on mobile
   useEffect(() => {
