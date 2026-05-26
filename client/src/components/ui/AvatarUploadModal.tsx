@@ -93,7 +93,7 @@ export default function AvatarUploadModal({ onClose }: Props) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40"
+        className="fixed inset-0 z-40 min-h-dvh"
         style={{ background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)" }}
         aria-hidden="true"
         onClick={onClose}

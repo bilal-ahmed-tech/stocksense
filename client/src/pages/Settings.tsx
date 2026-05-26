@@ -619,7 +619,7 @@ function ConfirmModal({
   return (
     <>
       <div
-        className="fixed inset-0 z-40"
+        className="fixed inset-0 z-40 min-h-dvh"
         style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}
         aria-hidden="true"
         onClick={onCancel}
