@@ -96,7 +96,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const openModal = useUIStore((s) => s.openModal);
 
-  const { data: portfolio } = usePortfolio();
+  const { data: portfolio, isLoading: portfolioLoading } = usePortfolio();
   const {
     data: performance,
     isLoading: perfLoading,
@@ -109,7 +109,6 @@ export default function Dashboard() {
   const holdings = portfolio?.holdings ?? [];
 
   // ─── Live P&L calculated client-side using Finnhub prices ────────────────
-  // Same pattern as Portfolio page — batch fetch, no extra API patterns needed
   const { quotes } = useStockQuotes(holdings.map((h) => h.symbol));
 
   const livePortfolioValue = holdings.reduce((sum, h) => {
@@ -175,7 +174,6 @@ export default function Dashboard() {
           </div>
         ) : (
           <>
-            {/* Live portfolio value — uses Finnhub prices */}
             <StatCard
               label="Portfolio Value"
               value={formatUSD(livePortfolioValue)}
@@ -184,7 +182,6 @@ export default function Dashboard() {
               iconColor="#818cf8"
               loading={perfLoading}
             />
-            {/* Live P&L — calculated client-side */}
             <StatCard
               label="Total P&L"
               value={`${isPositive ? "+" : ""}${formatUSD(totalPnl)}`}
@@ -203,7 +200,6 @@ export default function Dashboard() {
               valueColor={isPositive ? "#10b981" : "#ef4444"}
               loading={perfLoading}
             />
-            {/* Total invested — from server */}
             <StatCard
               label="Total Invested"
               value={formatUSD(totalInvested)}
@@ -230,7 +226,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
         <section
           aria-label="Portfolio performance chart"
-          className="rounded-2xl p-6 overflow-hidden"
+          className="rounded-2xl p-6"
           style={{
             background: "#0e0e10",
             border: "1px solid rgba(255,255,255,0.07)",
@@ -244,12 +240,20 @@ export default function Dashboard() {
               Portfolio Performance
             </span>
           </div>
-          <PerformanceChart chart={performance?.chart ?? []} />
+          {/* Skeleton while performance data loads */}
+          {perfLoading ? (
+            <div
+              className="rounded-xl animate-pulse"
+              style={{ height: 176, background: "rgba(255,255,255,0.04)" }}
+            />
+          ) : (
+            <PerformanceChart chart={performance?.chart ?? []} />
+          )}
         </section>
 
         <section
           aria-label="Asset allocation"
-          className="rounded-2xl p-6 overflow-hidden"
+          className="rounded-2xl p-6"
           style={{
             background: "#0e0e10",
             border: "1px solid rgba(255,255,255,0.07)",
@@ -261,7 +265,27 @@ export default function Dashboard() {
           >
             Allocation
           </span>
-          {holdings.length === 0 ? (
+          {/* Skeleton while portfolio loads */}
+          {portfolioLoading ? (
+            <div className="space-y-3">
+              <div
+                className="rounded-xl animate-pulse mx-auto"
+                style={{
+                  height: 140,
+                  width: 140,
+                  borderRadius: "50%",
+                  background: "rgba(255,255,255,0.04)",
+                }}
+              />
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="h-4 rounded animate-pulse"
+                  style={{ background: "rgba(255,255,255,0.04)" }}
+                />
+              ))}
+            </div>
+          ) : holdings.length === 0 ? (
             <div className="flex items-center justify-center h-44">
               <p
                 className="text-sm"
@@ -456,9 +480,6 @@ function StatCard({
 }
 
 // ─── Performance Chart ────────────────────────────────────────────────────────
-// Data comes from transaction history replay in portfolio.service.ts
-// Each point = portfolio value at that trade date using priceAtTime stored
-// in the Transaction model — zero extra API calls needed
 
 function PerformanceChart({ chart }: { chart: PerformancePoint[] }) {
   if (chart.length === 0) {
