@@ -24,11 +24,12 @@ import { usePerformance } from "@/hooks/usePerformance";
 import { useTransactions } from "@/hooks/useTransactions";
 import { useWatchlist } from "@/hooks/useWatchlist";
 import { useStock } from "@/hooks/useStock";
+import { useStockQuotes } from "@/hooks/useStockQuotes";
 import { useUIStore } from "@/stores/useUIStore";
 import { formatUSD, formatPercent } from "@/lib/formatters";
 import { format, parseISO } from "date-fns";
 import type { RootState } from "@/app/store";
-import type { Holding, Transaction } from "@/types";
+import type { Holding, Transaction, PerformancePoint } from "@/types";
 import ErrorCard from "@/components/ui/ErrorCard";
 
 const PIE_COLORS = [
@@ -59,13 +60,15 @@ function ChartTooltip({
         borderRadius: 10,
         padding: "10px 14px",
         boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-      }}>
+      }}
+    >
       <p
         style={{
           color: "rgba(255,255,255,0.4)",
           marginBottom: 4,
           fontSize: 11,
-        }}>
+        }}
+      >
         {(() => {
           try {
             return format(parseISO(label ?? ""), "MMM d, yyyy");
@@ -80,7 +83,8 @@ function ChartTooltip({
           fontWeight: 700,
           fontVariantNumeric: "tabular-nums",
           fontSize: 15,
-        }}>
+        }}
+      >
         {val != null ? formatUSD(val) : "—"}
       </p>
     </div>
@@ -103,7 +107,21 @@ export default function Dashboard() {
   const { data: watchlist } = useWatchlist();
 
   const holdings = portfolio?.holdings ?? [];
-  const isPositive = (performance?.totalPnl ?? 0) >= 0;
+
+  // ─── Live P&L calculated client-side using Finnhub prices ────────────────
+  // Same pattern as Portfolio page — batch fetch, no extra API patterns needed
+  const { quotes } = useStockQuotes(holdings.map((h) => h.symbol));
+
+  const livePortfolioValue = holdings.reduce((sum, h) => {
+    const price = quotes[h.symbol]?.price ?? h.avgBuyPrice;
+    return sum + price * h.shares;
+  }, 0);
+
+  const totalInvested = performance?.totalInvested ?? 0;
+  const totalPnl = livePortfolioValue - totalInvested;
+  const totalPnlPercent =
+    totalInvested > 0 ? (totalPnl / totalInvested) * 100 : 0;
+  const isPositive = totalPnl >= 0;
 
   const greeting = () => {
     const h = new Date().getHours();
@@ -126,7 +144,8 @@ export default function Dashboard() {
           </h1>
           <p
             className="text-sm mt-1"
-            style={{ color: "rgba(255,255,255,0.35)" }}>
+            style={{ color: "rgba(255,255,255,0.35)" }}
+          >
             {isPositive
               ? "Your portfolio is up today"
               : "Market is volatile today"}
@@ -135,7 +154,8 @@ export default function Dashboard() {
         <button
           onClick={() => openModal("trade")}
           className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2.5 text-sm font-semibold text-white rounded-xl transition-all active:scale-95 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-          style={{ background: "#4f46e5" }}>
+          style={{ background: "#4f46e5" }}
+        >
           <Plus size={15} strokeWidth={2.5} aria-hidden="true" />
           New Trade
         </button>
@@ -144,7 +164,8 @@ export default function Dashboard() {
       {/* Stat cards */}
       <section
         aria-label="Portfolio statistics"
-        className="py-4 sm:py-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        className="py-4 sm:py-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+      >
         {perfError ? (
           <div className="col-span-full">
             <ErrorCard
@@ -154,18 +175,20 @@ export default function Dashboard() {
           </div>
         ) : (
           <>
+            {/* Live portfolio value — uses Finnhub prices */}
             <StatCard
               label="Portfolio Value"
-              value={formatUSD(performance?.totalValue ?? 0)}
+              value={formatUSD(livePortfolioValue)}
               icon={<BriefcaseBusiness size={16} strokeWidth={1.5} />}
               iconBg="rgba(99,102,241,0.15)"
               iconColor="#818cf8"
               loading={perfLoading}
             />
+            {/* Live P&L — calculated client-side */}
             <StatCard
               label="Total P&L"
-              value={`${isPositive ? "+" : ""}${formatUSD(performance?.totalPnl ?? 0)}`}
-              sub={formatPercent(performance?.totalPnlPercent ?? 0)}
+              value={`${isPositive ? "+" : ""}${formatUSD(totalPnl)}`}
+              sub={formatPercent(totalPnlPercent)}
               icon={
                 isPositive ? (
                   <TrendingUp size={16} strokeWidth={1.5} />
@@ -180,10 +203,11 @@ export default function Dashboard() {
               valueColor={isPositive ? "#10b981" : "#ef4444"}
               loading={perfLoading}
             />
+            {/* Total invested — from server */}
             <StatCard
               label="Total Invested"
-              value={formatUSD(performance?.totalInvested ?? 0)}
-              sub={`${holdings.length} position${holdings.length !== 1 ? "s" : ""}`}
+              value={formatUSD(totalInvested)}
+              sub={`${performance?.totalHoldings ?? holdings.length} position${(performance?.totalHoldings ?? holdings.length) !== 1 ? "s" : ""}`}
               icon={<ArrowUpRight size={16} strokeWidth={1.5} />}
               iconBg="rgba(99,102,241,0.15)"
               iconColor="#818cf8"
@@ -210,45 +234,17 @@ export default function Dashboard() {
           style={{
             background: "#0e0e10",
             border: "1px solid rgba(255,255,255,0.07)",
-          }}>
+          }}
+        >
           <div className="flex items-center justify-between mb-6">
             <span
               className="text-sm font-semibold"
-              style={{ color: "rgba(255,255,255,0.55)" }}>
+              style={{ color: "rgba(255,255,255,0.55)" }}
+            >
               Portfolio Performance
             </span>
-            <div
-              className="flex gap-1 p-1 rounded-lg"
-              style={{ background: "rgba(255,255,255,0.05)" }}>
-              {["1D", "1W", "1M", "1Y"].map((tf) => (
-                <button
-                  key={tf}
-                  className="text-xs px-3 py-1 rounded-md transition-all focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-500"
-                  style={
-                    tf === "1M"
-                      ? {
-                          background: "#4f46e5",
-                          color: "#fff",
-                          fontWeight: 600,
-                        }
-                      : { color: "rgba(255,255,255,0.35)" }
-                  }>
-                  {tf}
-                </button>
-              ))}
-            </div>
           </div>
-          {holdings.length === 0 ? (
-            <div className="flex items-center justify-center h-44">
-              <p
-                className="text-sm"
-                style={{ color: "rgba(255,255,255,0.25)" }}>
-                No holdings to display
-              </p>
-            </div>
-          ) : (
-            <HoldingsChart holdings={holdings} />
-          )}
+          <PerformanceChart chart={performance?.chart ?? []} />
         </section>
 
         <section
@@ -257,17 +253,20 @@ export default function Dashboard() {
           style={{
             background: "#0e0e10",
             border: "1px solid rgba(255,255,255,0.07)",
-          }}>
+          }}
+        >
           <span
             className="text-sm font-semibold block mb-5"
-            style={{ color: "rgba(255,255,255,0.55)" }}>
+            style={{ color: "rgba(255,255,255,0.55)" }}
+          >
             Allocation
           </span>
           {holdings.length === 0 ? (
             <div className="flex items-center justify-center h-44">
               <p
                 className="text-sm"
-                style={{ color: "rgba(255,255,255,0.25)" }}>
+                style={{ color: "rgba(255,255,255,0.25)" }}
+              >
                 No holdings
               </p>
             </div>
@@ -285,24 +284,28 @@ export default function Dashboard() {
           style={{
             background: "#0e0e10",
             border: "1px solid rgba(255,255,255,0.07)",
-          }}>
+          }}
+        >
           <div className="flex items-center justify-between mb-5">
             <span
               className="text-sm font-semibold"
-              style={{ color: "rgba(255,255,255,0.55)" }}>
+              style={{ color: "rgba(255,255,255,0.55)" }}
+            >
               Watchlist
             </span>
             <button
               onClick={() => navigate("/watchlist")}
               className="text-xs font-medium transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded"
-              style={{ color: "#818cf8" }}>
+              style={{ color: "#818cf8" }}
+            >
               View all →
             </button>
           </div>
           {!watchlist?.symbols.length ? (
             <p
               className="text-sm text-center py-10"
-              style={{ color: "rgba(255,255,255,0.25)" }}>
+              style={{ color: "rgba(255,255,255,0.25)" }}
+            >
               No stocks watched
             </p>
           ) : (
@@ -324,17 +327,20 @@ export default function Dashboard() {
           style={{
             background: "#0e0e10",
             border: "1px solid rgba(255,255,255,0.07)",
-          }}>
+          }}
+        >
           <div className="flex items-center justify-between mb-5">
             <span
               className="text-sm font-semibold"
-              style={{ color: "rgba(255,255,255,0.55)" }}>
+              style={{ color: "rgba(255,255,255,0.55)" }}
+            >
               Recent Transactions
             </span>
             <button
               onClick={() => navigate("/portfolio")}
               className="text-xs font-medium transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded"
-              style={{ color: "#818cf8" }}>
+              style={{ color: "#818cf8" }}
+            >
               View all →
             </button>
           </div>
@@ -343,7 +349,8 @@ export default function Dashboard() {
           ) : !transactions?.length ? (
             <p
               className="text-sm text-center py-10"
-              style={{ color: "rgba(255,255,255,0.25)" }}>
+              style={{ color: "rgba(255,255,255,0.25)" }}
+            >
               No transactions yet
             </p>
           ) : (
@@ -396,14 +403,16 @@ function StatCard({
         (e.currentTarget as HTMLDivElement).style.border =
           "1px solid rgba(255,255,255,0.07)";
         (e.currentTarget as HTMLDivElement).style.background = "#0e0e10";
-      }}>
+      }}
+    >
       <div className="flex items-center justify-between">
         <span className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
           {label}
         </span>
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center"
-          style={{ background: iconBg, color: iconColor }}>
+          style={{ background: iconBg, color: iconColor }}
+        >
           {icon}
         </div>
       </div>
@@ -424,15 +433,19 @@ function StatCard({
         <div>
           <p
             className="text-2xl font-bold tracking-tight font-mono"
-            style={{ color: valueColor ?? "#fff" }}>
+            style={{ color: valueColor ?? "#fff" }}
+          >
             {value}
           </p>
           {sub && (
             <p
               className="text-xs mt-1"
               style={{
-                color: valueColor ? `${valueColor}90` : "rgba(255,255,255,0.3)",
-              }}>
+                color: valueColor
+                  ? `${valueColor}90`
+                  : "rgba(255,255,255,0.3)",
+              }}
+            >
               {sub}
             </p>
           )}
@@ -442,20 +455,29 @@ function StatCard({
   );
 }
 
-// ─── Holdings Chart ───────────────────────────────────────────────────────────
+// ─── Performance Chart ────────────────────────────────────────────────────────
+// Data comes from transaction history replay in portfolio.service.ts
+// Each point = portfolio value at that trade date using priceAtTime stored
+// in the Transaction model — zero extra API calls needed
 
-function HoldingsChart({ holdings }: { holdings: Holding[] }) {
-  const data = holdings.map((h) => ({
-    name: h.symbol,
-    value: h.totalInvested,
-  }));
+function PerformanceChart({ chart }: { chart: PerformancePoint[] }) {
+  if (chart.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-44">
+        <p className="text-sm" style={{ color: "rgba(255,255,255,0.25)" }}>
+          Make your first trade to see performance
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ width: "100%", height: 176 }}>
       <ResponsiveContainer width="100%" height={176}>
         <AreaChart
-          data={data}
-          margin={{ top: 5, right: 4, left: 0, bottom: 0 }}>
+          data={chart}
+          margin={{ top: 5, right: 4, left: 0, bottom: 0 }}
+        >
           <defs>
             <linearGradient id="dashGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
@@ -463,10 +485,18 @@ function HoldingsChart({ holdings }: { holdings: Holding[] }) {
             </linearGradient>
           </defs>
           <XAxis
-            dataKey="name"
+            dataKey="date"
+            tickFormatter={(v: string) => {
+              try {
+                return format(parseISO(v), "MMM d");
+              } catch {
+                return v;
+              }
+            }}
             tick={{ fill: "rgba(255,255,255,0.2)", fontSize: 11 }}
             axisLine={false}
             tickLine={false}
+            interval="preserveStartEnd"
           />
           <YAxis
             tick={{ fill: "rgba(255,255,255,0.2)", fontSize: 11 }}
@@ -474,6 +504,7 @@ function HoldingsChart({ holdings }: { holdings: Holding[] }) {
             tickLine={false}
             tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
             width={44}
+            domain={["dataMin - 100", "dataMax + 100"]}
           />
           <Tooltip
             content={<ChartTooltip />}
@@ -522,7 +553,8 @@ function AllocationChart({ holdings }: { holdings: Holding[] }) {
               outerRadius={62}
               dataKey="value"
               strokeWidth={0}
-              isAnimationActive={false}>
+              isAnimationActive={false}
+            >
               {data.map((_, i) => (
                 <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
               ))}
@@ -551,14 +583,18 @@ function AllocationChart({ holdings }: { holdings: Holding[] }) {
               />
               <span
                 className="font-mono text-xs"
-                style={{ color: "rgba(255,255,255,0.5)" }}>
+                style={{ color: "rgba(255,255,255,0.5)" }}
+              >
                 {item.name}
               </span>
             </div>
             <span
               className="font-mono text-xs font-medium"
-              style={{ color: "rgba(255,255,255,0.7)" }}>
-              {total > 0 ? `${((item.value / total) * 100).toFixed(0)}%` : "—"}
+              style={{ color: "rgba(255,255,255,0.7)" }}
+            >
+              {total > 0
+                ? `${((item.value / total) * 100).toFixed(0)}%`
+                : "—"}
             </span>
           </li>
         ))}
@@ -592,11 +628,13 @@ function WatchlistRow({
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLButtonElement).style.background =
             "transparent";
-        }}>
+        }}
+      >
         <div className="flex items-center gap-3">
           <div
             className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold transition-all group-hover:scale-105"
-            style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}>
+            style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}
+          >
             {symbol.slice(0, 2)}
           </div>
           <div className="text-left">
@@ -605,7 +643,8 @@ function WatchlistRow({
             </p>
             <p
               className="text-xs truncate max-w-28"
-              style={{ color: "rgba(255,255,255,0.3)" }}>
+              style={{ color: "rgba(255,255,255,0.3)" }}
+            >
               {quote?.name?.split(" ").slice(0, 2).join(" ") ?? "—"}
             </p>
           </div>
@@ -622,7 +661,8 @@ function WatchlistRow({
             </p>
             <p
               className="font-mono text-xs font-medium"
-              style={{ color: isPositive ? "#10b981" : "#ef4444" }}>
+              style={{ color: isPositive ? "#10b981" : "#ef4444" }}
+            >
               {isPositive ? "↑" : "↓"} {formatPercent(quote.changePercent)}
             </p>
           </div>
@@ -645,7 +685,8 @@ function TransactionRow({ tx }: { tx: Transaction }) {
       }}
       onMouseLeave={(e) => {
         (e.currentTarget as HTMLLIElement).style.background = "transparent";
-      }}>
+      }}
+    >
       <div className="flex items-center gap-3">
         <div
           className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs"
@@ -653,7 +694,8 @@ function TransactionRow({ tx }: { tx: Transaction }) {
             tx.type === "BUY"
               ? { background: "rgba(16,185,129,0.1)", color: "#10b981" }
               : { background: "rgba(239,68,68,0.1)", color: "#ef4444" }
-          }>
+          }
+        >
           {tx.type === "BUY" ? "↑" : "↓"}
         </div>
         <div>
@@ -667,7 +709,8 @@ function TransactionRow({ tx }: { tx: Transaction }) {
                 tx.type === "BUY"
                   ? { background: "rgba(16,185,129,0.1)", color: "#10b981" }
                   : { background: "rgba(239,68,68,0.1)", color: "#ef4444" }
-              }>
+              }
+            >
               {tx.type}
             </span>
           </div>
@@ -683,7 +726,8 @@ function TransactionRow({ tx }: { tx: Transaction }) {
         <time
           dateTime={tx.createdAt}
           className="text-xs"
-          style={{ color: "rgba(255,255,255,0.3)" }}>
+          style={{ color: "rgba(255,255,255,0.3)" }}
+        >
           {format(parseISO(tx.createdAt), "MMM d")}
         </time>
       </div>

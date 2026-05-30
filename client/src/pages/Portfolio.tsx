@@ -49,22 +49,25 @@ export default function Portfolio() {
     <main className="space-y-6">
       <title>Portfolio — StockSense</title>
 
-      {/* Header */}
-      <header className="flex items-start justify-between">
+      {/* Header — stacked on mobile, row on sm+ */}
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">
             Portfolio
           </h1>
           <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
             Virtual balance:{" "}
-            <span className="font-mono font-semibold" style={{ color: "#a5b4fc" }}>
+            <span
+              className="font-mono font-semibold"
+              style={{ color: "#a5b4fc" }}
+            >
               {formatUSD(user?.virtualBalance ?? 0)}
             </span>
           </p>
         </div>
         <button
           onClick={() => openModal("trade")}
-          className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white rounded-xl transition-all active:scale-95 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white rounded-xl transition-all active:scale-95 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 sm:w-auto w-full shrink-0"
           style={{ background: "#4f46e5" }}
         >
           <TrendingUp size={15} strokeWidth={2} aria-hidden="true" />
@@ -72,11 +75,11 @@ export default function Portfolio() {
         </button>
       </header>
 
-      {/* Tabs */}
+      {/* Tabs — full width on mobile, auto on sm+ */}
       <div
         role="tablist"
         aria-label="Portfolio sections"
-        className="flex gap-1 p-1 rounded-xl w-fit"
+        className="flex gap-1 p-1 rounded-xl w-full sm:w-fit"
         style={{
           background: "rgba(255,255,255,0.04)",
           border: "1px solid rgba(255,255,255,0.07)",
@@ -94,7 +97,7 @@ export default function Portfolio() {
             aria-selected={activeTab === id}
             aria-controls={`${id}-panel`}
             onClick={() => setActiveTab(id)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+            className="flex flex-1 sm:flex-none items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
             style={
               activeTab === id
                 ? { background: "#4f46e5", color: "#fff" }
@@ -121,7 +124,8 @@ export default function Portfolio() {
       {activeTab === "holdings" && (
         <section id="holdings-panel" role="tabpanel" aria-label="Holdings">
           {!portfolioError && (
-            <div className="flex items-center gap-2 mb-4">
+            /* flex-wrap so buttons wrap on very small screens */
+            <div className="flex flex-wrap items-center gap-2 mb-4">
               {(["all", "gain", "loss"] as const).map((f) => (
                 <button
                   key={f}
@@ -233,6 +237,7 @@ export default function Portfolio() {
                 scrollbarWidth: "none",
               }}
             >
+              {/* Desktop table — visible at sm+ */}
               <table
                 className="hidden sm:table w-full text-sm"
                 style={{ minWidth: 560 }}
@@ -244,7 +249,7 @@ export default function Portfolio() {
                         <th
                           key={h}
                           scope="col"
-                          className="px-5 py-3.5 text-xs font-semibold"
+                          className="px-4 py-3.5 text-xs font-semibold"
                           style={{
                             color: "rgba(255,255,255,0.3)",
                             textAlign: i >= 2 ? "right" : "left",
@@ -271,7 +276,7 @@ export default function Portfolio() {
                           "transparent";
                       }}
                     >
-                      <td className="px-5 py-3.5">
+                      <td className="px-4 py-3.5">
                         <span
                           className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-lg"
                           style={
@@ -288,27 +293,27 @@ export default function Portfolio() {
                           {tx.type}
                         </span>
                       </td>
-                      <td className="px-5 py-3.5">
+                      <td className="px-4 py-3.5">
                         <span className="font-mono text-sm font-semibold text-white">
                           {tx.symbol}
                         </span>
                       </td>
                       <td
-                        className="px-5 py-3.5 text-right font-mono text-sm"
+                        className="px-4 py-3.5 text-right font-mono text-sm"
                         style={{ color: "rgba(255,255,255,0.6)" }}
                       >
                         {tx.shares}
                       </td>
                       <td
-                        className="px-5 py-3.5 text-right font-mono text-sm"
+                        className="px-4 py-3.5 text-right font-mono text-sm"
                         style={{ color: "rgba(255,255,255,0.6)" }}
                       >
                         {formatUSD(tx.priceAtTime)}
                       </td>
-                      <td className="px-5 py-3.5 text-right font-mono text-sm font-semibold text-white">
+                      <td className="px-4 py-3.5 text-right font-mono text-sm font-semibold text-white">
                         {formatUSD(tx.totalValue)}
                       </td>
-                      <td className="px-5 py-3.5 text-right">
+                      <td className="px-4 py-3.5 text-right">
                         <time
                           dateTime={tx.createdAt}
                           className="text-xs"
@@ -322,7 +327,7 @@ export default function Portfolio() {
                 </tbody>
               </table>
 
-              {/* Mobile cards */}
+              {/* Mobile cards — hidden at sm+ */}
               <div
                 className="sm:hidden divide-y"
                 style={{ borderColor: "rgba(255,255,255,0.06)" }}
@@ -358,7 +363,8 @@ export default function Portfolio() {
                         {format(parseISO(tx.createdAt), "MMM d, yyyy")}
                       </time>
                     </div>
-                    <div className="grid grid-cols-3 gap-2">
+                    {/* 2-col grid on mobile — Total spans full width */}
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
                       <div>
                         <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
                           Shares
@@ -375,7 +381,7 @@ export default function Portfolio() {
                           {formatUSD(tx.priceAtTime)}
                         </p>
                       </div>
-                      <div>
+                      <div className="col-span-2">
                         <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
                           Total
                         </p>
@@ -503,9 +509,14 @@ function HoldingsTable({
         </div>
       ) : (
         <>
-          {/* Desktop table */}
+          {/*
+            Desktop table — only shows at xl (1280px+).
+            Below xl the sidebar (224px) + table padding leaves too little
+            room for all columns, causing the Trade button to overflow.
+            The card layout below handles everything under xl cleanly.
+          */}
           <table
-            className="hidden lg:table w-full text-sm"
+            className="hidden xl:table w-full text-sm"
             style={{ minWidth: 640 }}
           >
             <thead>
@@ -514,7 +525,7 @@ function HoldingsTable({
                   <th
                     key={col}
                     scope="col"
-                    className="px-5 py-3.5"
+                    className="px-4 py-3.5"
                     style={{ textAlign: align }}
                   >
                     <button
@@ -543,7 +554,7 @@ function HoldingsTable({
                 ))}
                 <th
                   scope="col"
-                  className="px-5 py-3.5 text-right text-xs font-semibold"
+                  className="px-4 py-3.5 text-right text-xs font-semibold"
                   style={{ color: "rgba(255,255,255,0.3)" }}
                 >
                   Actions
@@ -564,9 +575,13 @@ function HoldingsTable({
             </tbody>
           </table>
 
-          {/* Mobile cards */}
+          {/*
+            Card layout — visible below xl.
+            Covers mobile (< sm), tablet, and the 1000–1280px range
+            where the open sidebar would cramp the table.
+          */}
           <div
-            className="lg:hidden divide-y"
+            className="xl:hidden divide-y"
             style={{ borderColor: "rgba(255,255,255,0.06)" }}
           >
             {sorted.map((holding) => (
@@ -586,7 +601,7 @@ function HoldingsTable({
   );
 }
 
-// ─── Holding Row (desktop) ────────────────────────────────────────────────────
+// ─── Holding Row (xl desktop table) ──────────────────────────────────────────
 
 function HoldingRow({
   holding,
@@ -619,7 +634,7 @@ function HoldingRow({
         (e.currentTarget as HTMLTableRowElement).style.background = "transparent";
       }}
     >
-      <td className="px-3 py-4">
+      <td className="px-4 py-4">
         <div className="flex items-center gap-3">
           <div
             className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-transform group-hover:scale-105"
@@ -627,28 +642,37 @@ function HoldingRow({
           >
             {holding.symbol.slice(0, 2)}
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="font-mono font-semibold text-white">{holding.symbol}</p>
-            <p className="text-xs truncate max-w-28" style={{ color: "rgba(255,255,255,0.3)" }}>
+            <p
+              className="text-xs truncate max-w-28"
+              style={{ color: "rgba(255,255,255,0.3)" }}
+            >
               {holding.name}
             </p>
           </div>
         </div>
       </td>
-      <td className="px-5 py-4 text-right font-mono text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
+      <td
+        className="px-4 py-4 text-right font-mono text-sm"
+        style={{ color: "rgba(255,255,255,0.6)" }}
+      >
         {holding.shares}
       </td>
-      <td className="px-5 py-4 text-right font-mono text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
+      <td
+        className="px-4 py-4 text-right font-mono text-sm"
+        style={{ color: "rgba(255,255,255,0.6)" }}
+      >
         {formatUSD(holding.avgBuyPrice)}
       </td>
-      <td className="px-5 py-4 text-right font-mono text-sm font-semibold text-white">
+      <td className="px-4 py-4 text-right font-mono text-sm font-semibold text-white">
         {quote
           ? formatUSD(currentPrice)
           : quoteError
             ? formatUSD(holding.avgBuyPrice)
             : <Shimmer />}
       </td>
-      <td className="px-5 py-4 text-right">
+      <td className="px-4 py-4 text-right">
         {quote ? (
           <div>
             <p
@@ -657,8 +681,7 @@ function HoldingRow({
             >
               {isPos
                 ? <TrendingUp size={12} strokeWidth={2} aria-hidden="true" />
-                : <TrendingDown size={12} strokeWidth={2} aria-hidden="true" />
-              }
+                : <TrendingDown size={12} strokeWidth={2} aria-hidden="true" />}
               {isPos ? "+" : ""}
               {formatUSD(pnl)}
             </p>
@@ -675,20 +698,23 @@ function HoldingRow({
           <Shimmer />
         )}
       </td>
-      <td className="px-5 py-4 text-right font-mono text-sm font-semibold text-white">
+      <td className="px-4 py-4 text-right font-mono text-sm font-semibold text-white">
         {quote
           ? formatUSD(currentValue)
           : quoteError
             ? <span style={{ color: "rgba(255,255,255,0.25)" }}>—</span>
             : <Shimmer />}
       </td>
-      <td className="px-5 py-4">
+      <td className="px-4 py-4">
         <div className="flex items-center justify-end gap-2">
           <button
             onClick={() => onView(holding.symbol)}
             aria-label={`View ${holding.symbol} details`}
             className="w-8 h-8 flex items-center justify-center rounded-lg transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-            style={{ color: "rgba(255,255,255,0.3)", border: "1px solid rgba(255,255,255,0.08)" }}
+            style={{
+              color: "rgba(255,255,255,0.3)",
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
             onMouseEnter={(e) => {
               const el = e.currentTarget as HTMLButtonElement;
               el.style.background = "rgba(255,255,255,0.06)";
@@ -708,7 +734,11 @@ function HoldingRow({
             onClick={() => onTrade(holding.symbol)}
             aria-label={`Trade ${holding.symbol}`}
             className="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-            style={{ background: "rgba(99,102,241,0.12)", color: "#a5b4fc", border: "1px solid rgba(99,102,241,0.2)" }}
+            style={{
+              background: "rgba(99,102,241,0.12)",
+              color: "#a5b4fc",
+              border: "1px solid rgba(99,102,241,0.2)",
+            }}
             onMouseEnter={(e) => {
               const el = e.currentTarget as HTMLButtonElement;
               el.style.background = "#4f46e5";
@@ -730,7 +760,7 @@ function HoldingRow({
   );
 }
 
-// ─── Holding Card (mobile) ────────────────────────────────────────────────────
+// ─── Holding Card (below xl) ──────────────────────────────────────────────────
 
 function HoldingCard({
   holding,
@@ -753,52 +783,96 @@ function HoldingCard({
 
   return (
     <div className="p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      {/* Top row — symbol + actions */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-3 min-w-0">
           <div
             className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0"
             style={{ background: "rgba(99,102,241,0.1)", color: "#818cf8" }}
           >
             {holding.symbol.slice(0, 2)}
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="font-mono font-semibold text-white">{holding.symbol}</p>
-            <p className="text-xs truncate max-w-32" style={{ color: "rgba(255,255,255,0.3)" }}>
+            <p
+              className="text-xs truncate"
+              style={{ color: "rgba(255,255,255,0.3)" }}
+            >
               {holding.name}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => onView(holding.symbol)}
             aria-label={`View ${holding.symbol} details`}
-            className="w-8 h-8 flex items-center justify-center rounded-lg transition-all"
-            style={{ color: "rgba(255,255,255,0.3)", border: "1px solid rgba(255,255,255,0.08)" }}
+            className="w-8 h-8 flex items-center justify-center rounded-lg transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+            style={{
+              color: "rgba(255,255,255,0.3)",
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLButtonElement;
+              el.style.background = "rgba(255,255,255,0.06)";
+              el.style.color = "#fff";
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLButtonElement;
+              el.style.background = "transparent";
+              el.style.color = "rgba(255,255,255,0.3)";
+            }}
           >
             <ExternalLink size={13} strokeWidth={1.5} aria-hidden="true" />
           </button>
           <button
             onClick={() => onTrade(holding.symbol)}
             aria-label={`Trade ${holding.symbol}`}
-            className="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all active:scale-95"
-            style={{ background: "rgba(99,102,241,0.12)", color: "#a5b4fc", border: "1px solid rgba(99,102,241,0.2)" }}
+            className="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+            style={{
+              background: "rgba(99,102,241,0.12)",
+              color: "#a5b4fc",
+              border: "1px solid rgba(99,102,241,0.2)",
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLButtonElement;
+              el.style.background = "#4f46e5";
+              el.style.color = "#fff";
+              el.style.border = "1px solid #4f46e5";
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLButtonElement;
+              el.style.background = "rgba(99,102,241,0.12)";
+              el.style.color = "#a5b4fc";
+              el.style.border = "1px solid rgba(99,102,241,0.2)";
+            }}
           >
             Trade
           </button>
         </div>
       </div>
 
+      {/* Stats grid */}
       <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 pt-1">
         <div>
-          <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>Shares</p>
-          <p className="font-mono text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>{holding.shares}</p>
+          <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+            Shares
+          </p>
+          <p className="font-mono text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
+            {holding.shares}
+          </p>
         </div>
         <div>
-          <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>Avg Cost</p>
-          <p className="font-mono text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>{formatUSD(holding.avgBuyPrice)}</p>
+          <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+            Avg Cost
+          </p>
+          <p className="font-mono text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
+            {formatUSD(holding.avgBuyPrice)}
+          </p>
         </div>
         <div>
-          <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>Current Price</p>
+          <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+            Current Price
+          </p>
           <p className="font-mono text-sm font-semibold text-white">
             {quote
               ? formatUSD(currentPrice)
@@ -808,7 +882,9 @@ function HoldingCard({
           </p>
         </div>
         <div>
-          <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>Value</p>
+          <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+            Value
+          </p>
           <p className="font-mono text-sm font-semibold text-white">
             {quote
               ? formatUSD(currentValue)
@@ -818,7 +894,9 @@ function HoldingCard({
           </p>
         </div>
         <div className="col-span-2">
-          <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>P&L</p>
+          <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+            P&L
+          </p>
           {quote ? (
             <div className="flex items-center gap-1.5">
               <p
@@ -827,12 +905,14 @@ function HoldingCard({
               >
                 {isPos
                   ? <TrendingUp size={12} strokeWidth={2} aria-hidden="true" />
-                  : <TrendingDown size={12} strokeWidth={2} aria-hidden="true" />
-                }
+                  : <TrendingDown size={12} strokeWidth={2} aria-hidden="true" />}
                 {isPos ? "+" : ""}
                 {formatUSD(pnl)}
               </p>
-              <p className="font-mono text-xs" style={{ color: isPos ? "#10b981" : "#ef4444", opacity: 0.75 }}>
+              <p
+                className="font-mono text-xs"
+                style={{ color: isPos ? "#10b981" : "#ef4444", opacity: 0.75 }}
+              >
                 ({formatPercent(pnlPercent)})
               </p>
             </div>
@@ -899,7 +979,7 @@ function TransactionsSkeleton() {
 function EmptyHoldings({ onBuy }: { onBuy: () => void }) {
   return (
     <div
-      className="rounded-2xl p-16 text-center space-y-5"
+      className="rounded-2xl p-10 sm:p-16 text-center space-y-5"
       style={{ background: "#0e0e10", border: "1px solid rgba(255,255,255,0.07)" }}
     >
       <div

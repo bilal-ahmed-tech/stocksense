@@ -1,15 +1,16 @@
 import type { Request, Response, NextFunction } from "express";
 import {
-  searchStocks,
   getStockQuote,
-  getStockChart,
+  searchStocks,
   getStockNews,
-} from "../services/alphaVantage.service";
+  RateLimitError,
+} from "../services/finnhub.service";
+import { getStockChart } from "../services/alphaVantage.service";
 
 export async function search(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   try {
     const q = req.query.q as string | undefined;
@@ -27,7 +28,7 @@ export async function search(
 export async function getQuote(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   try {
     const symbol = (req.params["symbol"] as string).toUpperCase();
@@ -41,12 +42,25 @@ export async function getQuote(
 export async function getChart(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   try {
     const symbol = (req.params["symbol"] as string).toUpperCase();
     const range = (req.query["range"] as string) ?? "1M";
-    const points = await getStockChart(symbol, range);
+
+    // Alpha Vantage for chart data — Finnhub candles require paid plan
+    const avPoints = await getStockChart(symbol, range);
+
+    // Map AlphaVantage StockChartPoint → ChartCandle shape the frontend expects
+    const points = avPoints.map((p) => ({
+      time: p.timestamp,
+      open: p.open,
+      high: p.high,
+      low: p.low,
+      close: p.close,
+      volume: p.volume,
+    }));
+
     res.json({ success: true, data: { points } });
   } catch (err) {
     next(err);
@@ -56,7 +70,7 @@ export async function getChart(
 export async function getNews(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> {
   try {
     const symbol = (req.params["symbol"] as string).toUpperCase();

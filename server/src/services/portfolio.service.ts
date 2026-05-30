@@ -131,3 +131,120 @@ export async function getHoldings(userId: string) {
 export async function getTransactionHistory(userId: string) {
   return Transaction.find({ userId }).sort({ createdAt: -1 }).limit(50);
 }
+export async function getPerformance(userId: string) {
+  const [portfolio, transactions, user] = await Promise.all([
+    getOrCreatePortfolio(userId),
+    Transaction.find({ userId }).sort({ createdAt: 1 }), // oldest first for replay
+    User.findById(userId),
+  ]);
+
+  // ─── Current P&L using avgBuyPrice (no live prices needed server-side) ───
+  // Live prices are fetched client-side via useStockQuotes — same pattern
+  // as Portfolio page. Server returns invested amounts, client enriches with
+  // live prices.
+
+  const totalInvested = portfolio.totalInvested;
+  const currentBalance = user?.virtualBalance ?? 0;
+
+  // ─── Historical chart — replay transactions to get portfolio value over time ───
+  // Each data point = total invested at that transaction date.
+  // We use priceAtTime already stored — zero extra API calls needed.
+
+  interface HoldingSnapshot {
+    shares: number;
+    avgBuyPrice: number;
+    totalInvested: number;
+  }
+
+  const holdingMap = new Map<string, HoldingSnapshot>();
+  const chartPoints: { date: string; value: number }[] = [];
+
+  let runningInvested = 0;
+
+  for (const tx of transactions) {
+    const sym = tx.symbol;
+
+    if (tx.type === "BUY") {
+      const existing = holdingMap.get(sym);
+      if (existing) {
+        const newTotalInvested = existing.totalInvested + tx.totalValue;
+        const newShares = existing.shares + tx.shares;
+        holdingMap.set(sym, {
+          shares: newShares,
+          avgBuyPrice: newTotalInvested / newShares,
+          totalInvested: newTotalInvested,
+        });
+      } else {
+        holdingMap.set(sym, {
+          shares: tx.shares,
+          avgBuyPrice: tx.priceAtTime,
+          totalInvested: tx.totalValue,
+        });
+      }
+      runningInvested += tx.totalValue;
+    } else {
+      // SELL
+      const existing = holdingMap.get(sym);
+      if (existing) {
+        const newShares = existing.shares - tx.shares;
+        const soldInvested = existing.avgBuyPrice * tx.shares;
+        runningInvested -= soldInvested;
+
+        if (newShares <= 0) {
+          holdingMap.delete(sym);
+        } else {
+          holdingMap.set(sym, {
+            shares: newShares,
+            avgBuyPrice: existing.avgBuyPrice,
+            totalInvested: existing.totalInvested - soldInvested,
+          });
+        }
+      }
+    }
+
+    // Snapshot — portfolio value at this transaction using priceAtTime
+    // This gives a real curve based on actual trade prices
+    let snapshotValue = 0;
+    holdingMap.forEach((h) => {
+      snapshotValue += h.shares * h.avgBuyPrice;
+    });
+
+    chartPoints.push({
+      date: tx.createdAt.toISOString().split("T")[0],
+      value: parseFloat(snapshotValue.toFixed(2)),
+    });
+  }
+
+  // Deduplicate same-day points — keep last trade of each day
+  const dedupedChart = chartPoints.reduce(
+    (acc, point) => {
+      acc[point.date] = point; // later trades overwrite earlier same-day trades
+      return acc;
+    },
+    {} as Record<string, { date: string; value: number }>
+  );
+
+  const chart = Object.values(dedupedChart).sort((a, b) =>
+    a.date.localeCompare(b.date)
+  );
+
+  // Add today as final point if there are holdings
+  if (portfolio.holdings.length > 0 && chart.length > 0) {
+    const today = new Date().toISOString().split("T")[0];
+    if (chart[chart.length - 1].date !== today) {
+      chart.push({
+        date: today,
+        value: parseFloat(totalInvested.toFixed(2)),
+      });
+    }
+  }
+
+  return {
+    totalInvested,
+    currentBalance,
+    totalHoldings: portfolio.holdings.length,
+    // P&L is calculated client-side with live prices
+    // Server returns invested amounts as baseline
+    chart,
+  };
+}

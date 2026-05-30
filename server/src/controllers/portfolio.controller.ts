@@ -6,8 +6,8 @@ import {
   buyStock,
   sellStock,
   getTransactionHistory,
+  getPerformance as getPerformanceService,
 } from "../services/portfolio.service";
-import { User } from "../models/User";
 
 const tradeSchema = z.object({
   symbol: z.string().min(1).max(10),
@@ -39,7 +39,9 @@ export async function buy(
     const { userId } = req as AuthRequest;
     const body = tradeSchema.safeParse(req.body);
     if (!body.success) {
-      res.status(400).json({ success: false, error: body.error.flatten().fieldErrors });
+      res
+        .status(400)
+        .json({ success: false, error: body.error.flatten().fieldErrors });
       return;
     }
 
@@ -60,7 +62,9 @@ export async function sell(
     const { userId } = req as AuthRequest;
     const body = tradeSchema.safeParse(req.body);
     if (!body.success) {
-      res.status(400).json({ success: false, error: body.error.flatten().fieldErrors });
+      res
+        .status(400)
+        .json({ success: false, error: body.error.flatten().fieldErrors });
       return;
     }
 
@@ -85,6 +89,7 @@ export async function getHistory(
     next(err);
   }
 }
+
 export async function getPerformance(
   req: Request,
   res: Response,
@@ -92,32 +97,9 @@ export async function getPerformance(
 ): Promise<void> {
   try {
     const { userId } = req as AuthRequest;
-    const portfolio = await getOrCreatePortfolio(userId);
-    const user = await User.findById(userId);
-
-    const totalInvested = portfolio.totalInvested;
-    const totalValue = portfolio.holdings.reduce((sum, h) => {
-      return sum + h.shares * h.avgBuyPrice;
-    }, 0);
-    const totalPnl = totalValue - totalInvested;
-    const totalPnlPercent =
-      totalInvested > 0 ? (totalPnl / totalInvested) * 100 : 0;
-
-    res.json({
-      success: true,
-      data: {
-        performance: {
-          totalValue,
-          totalInvested,
-          totalPnl,
-          totalPnlPercent,
-          dayChange: 0,
-          dayChangePercent: 0,
-          virtualBalance: user?.virtualBalance ?? 0,
-          chart: [],
-        },
-      },
-    });
+    // Business logic lives in the service — controller just wires request/response
+    const performance = await getPerformanceService(userId);
+    res.json({ success: true, data: { performance } });
   } catch (err) {
     next(err);
   }

@@ -58,13 +58,15 @@ function ChartTooltip({
         borderRadius: 10,
         padding: "8px 12px",
         boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
-      }}>
+      }}
+    >
       <p
         style={{
           color: "rgba(255,255,255,0.4)",
           fontSize: 11,
           marginBottom: 3,
-        }}>
+        }}
+      >
         {(() => {
           try {
             return format(parseISO(label ?? ""), "MMM d, yyyy");
@@ -79,7 +81,8 @@ function ChartTooltip({
           fontWeight: 700,
           fontVariantNumeric: "tabular-nums",
           fontSize: 14,
-        }}>
+        }}
+      >
         {val != null ? formatUSD(val) : "—"}
       </p>
     </div>
@@ -92,7 +95,12 @@ export default function StockDetail() {
   const isAuthenticated = useSelector((s: RootState) => s.auth.isAuthenticated);
   const { timeframe, setTimeframe } = useChartStore();
   const openModal = useUIStore((s) => s.openModal);
-  const { data: quote, isLoading: quoteLoading, isError: quoteError, refetch: refetchQuote } = useStock(symbol);
+  const {
+    data: quote,
+    isLoading: quoteLoading,
+    isError: quoteError,
+    refetch: refetchQuote,
+  } = useStock(symbol);
 
   const {
     data: chartPoints,
@@ -109,7 +117,7 @@ export default function StockDetail() {
   const isPositive = (quote?.changePercent ?? 0) >= 0;
 
   const chartData = (chartPoints ?? []).map((p) => ({
-    time: p.timestamp,
+    time: p.time,
     price: p.close,
   }));
 
@@ -150,7 +158,8 @@ export default function StockDetail() {
           onMouseLeave={(e) => {
             (e.currentTarget as HTMLButtonElement).style.color =
               "rgba(255,255,255,0.4)";
-          }}>
+          }}
+        >
           <ArrowLeft size={15} strokeWidth={1.5} aria-hidden="true" />
           Back
         </button>
@@ -171,7 +180,8 @@ export default function StockDetail() {
         <button
           onClick={() => navigate(-1)}
           className="text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded"
-          style={{ color: "#818cf8" }}>
+          style={{ color: "#818cf8" }}
+        >
           Go back
         </button>
       </div>
@@ -196,7 +206,8 @@ export default function StockDetail() {
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLButtonElement).style.color =
             "rgba(255,255,255,0.4)";
-        }}>
+        }}
+      >
         <ArrowLeft size={15} strokeWidth={1.5} aria-hidden="true" />
         Back
       </button>
@@ -208,7 +219,8 @@ export default function StockDetail() {
         style={{
           background: "#0e0e10",
           border: "1px solid rgba(255,255,255,0.07)",
-        }}>
+        }}
+      >
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5">
           {/* Left — name + price */}
           <div className="space-y-3">
@@ -218,7 +230,8 @@ export default function StockDetail() {
                 style={{
                   background: "rgba(99,102,241,0.12)",
                   color: "#818cf8",
-                }}>
+                }}
+              >
                 {quote.symbol.slice(0, 2)}
               </div>
               <div>
@@ -228,9 +241,18 @@ export default function StockDetail() {
                     style={{
                       background: "rgba(99,102,241,0.12)",
                       color: "#818cf8",
-                    }}>
+                    }}
+                  >
                     {quote.symbol}
                   </span>
+                  {quote.exchange && (
+                    <span
+                      className="text-xs"
+                      style={{ color: "rgba(255,255,255,0.25)" }}
+                    >
+                      {quote.exchange}
+                    </span>
+                  )}
                 </div>
                 <h1 className="text-lg font-bold text-white mt-0.5">
                   {quote.name}
@@ -245,7 +267,8 @@ export default function StockDetail() {
               <div
                 className="flex items-center gap-1.5 mb-1.5"
                 style={{ color: isPositive ? "#10b981" : "#ef4444" }}
-                aria-label={`Change: ${isPositive ? "+" : ""}${formatUSD(quote.change)} (${formatPercent(quote.changePercent)})`}>
+                aria-label={`Change: ${isPositive ? "+" : ""}${formatUSD(quote.change)} (${formatPercent(quote.changePercent)})`}
+              >
                 {isPositive ? (
                   <TrendingUp size={16} strokeWidth={2} aria-hidden="true" />
                 ) : (
@@ -261,7 +284,8 @@ export default function StockDetail() {
                     color: isPositive
                       ? "rgba(16,185,129,0.7)"
                       : "rgba(239,68,68,0.7)",
-                  }}>
+                  }}
+                >
                   ({formatPercent(quote.changePercent)})
                 </span>
               </div>
@@ -304,7 +328,8 @@ export default function StockDetail() {
                     (e.currentTarget as HTMLButtonElement).style.color =
                       "rgba(255,255,255,0.5)";
                   }
-                }}>
+                }}
+              >
                 {isWatched ? (
                   <BookmarkCheck
                     size={15}
@@ -325,7 +350,8 @@ export default function StockDetail() {
                 onClick={() => openModal("trade", symbol)}
                 aria-label={`Trade ${quote.symbol}`}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all active:scale-95 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                style={{ background: "#4f46e5" }}>
+                style={{ background: "#4f46e5" }}
+              >
                 <TrendingUp size={15} strokeWidth={1.5} aria-hidden="true" />
                 Trade
               </button>
@@ -341,18 +367,21 @@ export default function StockDetail() {
         style={{
           background: "#0e0e10",
           border: "1px solid rgba(255,255,255,0.07)",
-        }}>
+        }}
+      >
         <div className="flex items-center justify-between mb-5">
           <h2
             className="text-sm font-semibold"
-            style={{ color: "rgba(255,255,255,0.5)" }}>
+            style={{ color: "rgba(255,255,255,0.5)" }}
+          >
             Price History
           </h2>
           <div
             role="tablist"
             aria-label="Chart timeframe"
             className="flex gap-1 p-1 rounded-xl"
-            style={{ background: "rgba(255,255,255,0.05)" }}>
+            style={{ background: "rgba(255,255,255,0.05)" }}
+          >
             {TIMEFRAMES.map((tf) => (
               <button
                 key={tf}
@@ -374,7 +403,8 @@ export default function StockDetail() {
                   if (timeframe !== tf)
                     (e.currentTarget as HTMLButtonElement).style.color =
                       "rgba(255,255,255,0.35)";
-                }}>
+                }}
+              >
                 {tf}
               </button>
             ))}
@@ -386,18 +416,20 @@ export default function StockDetail() {
             className="rounded-xl animate-pulse"
             style={{ height: 220, background: "rgba(255,255,255,0.04)" }}
           />
-        ) : chartError || chartData.length === 0 ? (
+        ) : chartError ? (
           <div
             className="flex items-center justify-center rounded-xl"
-            style={{ height: 220 }}>
+            style={{ height: 220 }}
+          >
             <p className="text-sm" style={{ color: "rgba(255,255,255,0.25)" }}>
-              {chartError ? "Chart unavailable" : "No chart data available"}
+              Chart unavailable
             </p>
           </div>
         ) : chartData.length === 0 ? (
           <div
             className="flex items-center justify-center rounded-xl"
-            style={{ height: 220 }}>
+            style={{ height: 220 }}
+          >
             <p className="text-sm" style={{ color: "rgba(255,255,255,0.25)" }}>
               No chart data available
             </p>
@@ -405,11 +437,13 @@ export default function StockDetail() {
         ) : (
           <div
             aria-label={`${quote.symbol} price chart over ${timeframe}`}
-            style={{ width: "100%", height: 220 }}>
+            style={{ width: "100%", height: 220 }}
+          >
             <ResponsiveContainer width="100%" height={220}>
               <AreaChart
                 data={chartData}
-                margin={{ top: 5, right: 4, left: 0, bottom: 0 }}>
+                margin={{ top: 5, right: 4, left: 0, bottom: 0 }}
+              >
                 <defs>
                   <linearGradient id="stockGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop
@@ -485,10 +519,12 @@ export default function StockDetail() {
         style={{
           background: "#0e0e10",
           border: "1px solid rgba(255,255,255,0.07)",
-        }}>
+        }}
+      >
         <h2
           className="text-sm font-semibold mb-4"
-          style={{ color: "rgba(255,255,255,0.5)" }}>
+          style={{ color: "rgba(255,255,255,0.5)" }}
+        >
           Key Statistics
         </h2>
         <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -497,8 +533,14 @@ export default function StockDetail() {
             { label: "High", value: formatUSD(quote.high) },
             { label: "Low", value: formatUSD(quote.low) },
             { label: "Volume", value: formatVolume(quote.volume) },
-            { label: "52W High", value: formatUSD(quote.weekHigh52) },
-            { label: "52W Low", value: formatUSD(quote.weekLow52) },
+            {
+              label: "52W High",
+              value: quote.weekHigh52 ? formatUSD(quote.weekHigh52) : "N/A",
+            },
+            {
+              label: "52W Low",
+              value: quote.weekLow52 ? formatUSD(quote.weekLow52) : "N/A",
+            },
             {
               label: "Market Cap",
               value: quote.marketCap ? formatCompact(quote.marketCap) : "N/A",
@@ -514,10 +556,12 @@ export default function StockDetail() {
               style={{
                 background: "rgba(255,255,255,0.03)",
                 border: "1px solid rgba(255,255,255,0.05)",
-              }}>
+              }}
+            >
               <dt
                 className="text-[10px] font-semibold uppercase tracking-wider"
-                style={{ color: "rgba(255,255,255,0.3)" }}>
+                style={{ color: "rgba(255,255,255,0.3)" }}
+              >
                 {label}
               </dt>
               <dd className="font-mono text-sm font-semibold text-white">
@@ -535,10 +579,12 @@ export default function StockDetail() {
         style={{
           background: "#0e0e10",
           border: "1px solid rgba(255,255,255,0.07)",
-        }}>
+        }}
+      >
         <h2
           className="text-sm font-semibold mb-4"
-          style={{ color: "rgba(255,255,255,0.5)" }}>
+          style={{ color: "rgba(255,255,255,0.5)" }}
+        >
           Latest News
         </h2>
 
@@ -558,8 +604,8 @@ export default function StockDetail() {
           </p>
         ) : (
           <ul className="space-y-2">
-            {news.map((item, i) => (
-              <li key={i}>
+            {news.map((item) => (
+              <li key={item.id}>
                 <a
                   href={item.url}
                   target="_blank"
@@ -577,14 +623,17 @@ export default function StockDetail() {
                       "transparent";
                     (e.currentTarget as HTMLAnchorElement).style.border =
                       "1px solid rgba(255,255,255,0.06)";
-                  }}>
+                  }}
+                >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-3 mb-1.5">
                       <h3 className="text-sm font-semibold text-white group-hover:text-indigo-300 transition-colors line-clamp-2 leading-snug">
-                        {item.title}
+                        {item.headline}
                       </h3>
                       <div className="flex items-center gap-2 shrink-0">
-                        <SentimentBadge sentiment={item.sentiment} />
+                        {item.sentiment && (
+                          <SentimentBadge sentiment={item.sentiment} />
+                        )}
                         <ExternalLink
                           size={12}
                           strokeWidth={1.5}
@@ -595,12 +644,14 @@ export default function StockDetail() {
                     </div>
                     <p
                       className="text-xs line-clamp-2 mb-2 leading-relaxed"
-                      style={{ color: "rgba(255,255,255,0.35)" }}>
+                      style={{ color: "rgba(255,255,255,0.35)" }}
+                    >
                       {item.summary}
                     </p>
                     <div
                       className="flex items-center gap-1.5 text-xs"
-                      style={{ color: "rgba(255,255,255,0.25)" }}>
+                      style={{ color: "rgba(255,255,255,0.25)" }}
+                    >
                       <span>{item.source}</span>
                       <span aria-hidden="true">·</span>
                       <time dateTime={item.publishedAt}>
@@ -650,20 +701,16 @@ function SentimentBadge({ sentiment }: { sentiment: string }) {
   return (
     <span
       className="text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0"
-      style={{ background: config.bg, color: config.color }}>
+      style={{ background: config.bg, color: config.color }}
+    >
       {config.label}
     </span>
   );
 }
 
-// ─── Date formatter ───────────────────────────────────────────────────────────
-
 function formatNewsDate(dateStr: string): string {
   try {
-    const year = dateStr.slice(0, 4);
-    const month = dateStr.slice(4, 6);
-    const day = dateStr.slice(6, 8);
-    return format(new Date(`${year}-${month}-${day}`), "MMM d, yyyy");
+    return format(parseISO(dateStr), "MMM d, yyyy");
   } catch {
     return dateStr;
   }

@@ -8,15 +8,18 @@ import { useSocket } from "@/hooks/useSocket";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState, useEffect } from "react";
 import type { PriceUpdatePayload } from "@/types";
-
+import ScrollToTop from "./ScrollToTop";
 const MOBILE_BREAKPOINT = 1024;
 
 function SocketHandler() {
   const queryClient = useQueryClient();
 
-  const onPriceUpdate = useCallback((_payload: PriceUpdatePayload) => {
-    queryClient.invalidateQueries({ queryKey: ["stock"] });
-  }, [queryClient]);
+  const onPriceUpdate = useCallback(
+    (_payload: PriceUpdatePayload) => {
+      queryClient.invalidateQueries({ queryKey: ["stock"] });
+    },
+    [queryClient],
+  );
 
   useSocket(onPriceUpdate);
   return null;
@@ -26,7 +29,7 @@ export default function AppLayout() {
   const sidebarOpen = useUIStore((s) => s.sidebarOpen);
 
   const [isMobile, setIsMobile] = useState(
-    () => window.innerWidth < MOBILE_BREAKPOINT
+    () => window.innerWidth < MOBILE_BREAKPOINT,
   );
 
   useEffect(() => {
@@ -54,9 +57,9 @@ export default function AppLayout() {
 
       <div
         className="flex flex-col min-h-screen pt-14 transition-all duration-300"
-        style={{ marginLeft }}
-      >
+        style={{ marginLeft }}>
         <main className="flex-1 p-2 sm:p-6">
+          <ScrollToTop/>
           <Outlet />
         </main>
         <Footer />

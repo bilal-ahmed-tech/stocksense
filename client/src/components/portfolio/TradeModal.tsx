@@ -3,6 +3,7 @@ import { X, TrendingUp, TrendingDown, Minus, Plus } from "lucide-react";
 import { useUIStore } from "@/stores/useUIStore";
 import { useTradeStock } from "@/hooks/useTradeStock";
 import { useStock } from "@/hooks/useStock";
+import { usePortfolio } from "@/hooks/usePortfolio";
 import { useDebounce } from "@/hooks/useDebounce";
 import { formatUSD } from "@/lib/formatters";
 import { useSelector } from "react-redux";
@@ -13,7 +14,8 @@ export default function TradeModal() {
   const { activeModal, tradeSymbol, closeModal } = useUIStore();
   const user = useSelector((s: RootState) => s.auth.user);
   const [tradeType, setTradeType] = useState<TradeType>("BUY");
-  const [shares, setShares] = useState(1);
+  const [sharesInput, setSharesInput] = useState("1");
+  const shares = parseFloat(sharesInput) || 0;
   const [symbol, setSymbol] = useState(tradeSymbol ?? "");
   const inputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -22,9 +24,15 @@ export default function TradeModal() {
   const { data: quote, isLoading: quoteLoading } = useStock(
     debouncedSymbol.trim().toUpperCase(),
   );
+  const { data: portfolio } = usePortfolio();
   const { mutate: trade, isPending, error, reset } = useTradeStock();
 
   const isOpen = activeModal === "trade";
+
+  const holding = portfolio?.holdings.find(
+    (h) => h.symbol === debouncedSymbol.trim().toUpperCase(),
+  );
+  const ownedShares = holding?.shares ?? 0;
 
   useEffect(() => {
     if (tradeSymbol) setSymbol(tradeSymbol);
@@ -32,7 +40,7 @@ export default function TradeModal() {
 
   useEffect(() => {
     if (!isOpen) {
-      setShares(1);
+      setSharesInput("1");
       setTradeType("BUY");
       reset();
     } else {
@@ -40,7 +48,6 @@ export default function TradeModal() {
     }
   }, [isOpen, reset]);
 
-  // Lock body scroll + handle Escape + focus trap
   useEffect(() => {
     if (!isOpen) return;
 
@@ -52,7 +59,6 @@ export default function TradeModal() {
         return;
       }
 
-      // Focus trap
       if (e.key !== "Tab" || !modalRef.current) return;
 
       const focusable = modalRef.current.querySelectorAll<HTMLElement>(
@@ -86,23 +92,39 @@ export default function TradeModal() {
   const totalCost = quote ? shares * quote.price : 0;
   const canAfford =
     tradeType === "BUY" ? totalCost <= (user?.virtualBalance ?? 0) : true;
+  const canSell = tradeType === "SELL" ? shares <= ownedShares : true;
   const balanceAfter =
     tradeType === "BUY"
       ? (user?.virtualBalance ?? 0) - totalCost
       : (user?.virtualBalance ?? 0) + totalCost;
   const errorMessage = error instanceof Error ? error.message : null;
 
+  const submitDisabled =
+    isPending ||
+    !quote ||
+    !quote.price ||
+    shares <= 0 ||
+    !canAfford ||
+    !canSell;
+
+  const sellError =
+    tradeType === "SELL" && ownedShares === 0
+      ? `You don't own any ${debouncedSymbol.toUpperCase()} shares`
+      : tradeType === "SELL" && shares > ownedShares
+        ? `You only own ${ownedShares} share${ownedShares !== 1 ? "s" : ""}`
+        : null;
+
   function increment() {
-    setShares((s) => Math.min(9999, parseFloat((s + 1).toFixed(2))));
+    setSharesInput((s) => String(Math.min(9999, (parseFloat(s) || 0) + 1)));
   }
 
   function decrement() {
-    setShares((s) => Math.max(1, parseFloat((s - 1).toFixed(2))));
+    setSharesInput((s) => String(Math.max(1, (parseFloat(s) || 0) - 1)));
   }
 
   function handleSharesChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const val = parseFloat(e.target.value);
-    if (!isNaN(val) && val > 0) setShares(val);
+    const raw = e.target.value;
+    if (/^\d*\.?\d*$/.test(raw)) setSharesInput(raw);
   }
 
   function handleSubmit() {
@@ -134,7 +156,8 @@ export default function TradeModal() {
         role="dialog"
         aria-modal="true"
         aria-label={`Trade ${symbol.toUpperCase()}`}
-        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      >
         <div
           ref={modalRef}
           className="w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl flex flex-col"
@@ -144,7 +167,8 @@ export default function TradeModal() {
             boxShadow: "0 24px 80px rgba(0,0,0,0.7)",
             maxHeight: "92dvh",
             overflow: "hidden",
-          }}>
+          }}
+        >
           {/* Drag handle on mobile */}
           <div className="flex justify-center pt-3 pb-1 sm:hidden">
             <div
@@ -157,14 +181,13 @@ export default function TradeModal() {
           {/* Header */}
           <div
             className="flex items-center justify-between px-5 py-3.5 shrink-0"
-            style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+            style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
+          >
             <div className="flex items-center gap-2.5">
               <div
                 className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0"
-                style={{
-                  background: "rgba(99,102,241,0.12)",
-                  color: "#818cf8",
-                }}>
+                style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}
+              >
                 {symbol.slice(0, 2).toUpperCase() || "—"}
               </div>
               <div>
@@ -174,7 +197,8 @@ export default function TradeModal() {
                 {quote && (
                   <p
                     className="text-[10px] mt-0.5 truncate max-w-40"
-                    style={{ color: "rgba(255,255,255,0.35)" }}>
+                    style={{ color: "rgba(255,255,255,0.35)" }}
+                  >
                     {quote.name}
                   </p>
                 )}
@@ -186,16 +210,14 @@ export default function TradeModal() {
               className="w-7 h-7 flex items-center justify-center rounded-lg transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
               style={{ color: "rgba(255,255,255,0.35)" }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
-                  "rgba(255,255,255,0.07)";
+                (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.07)";
                 (e.currentTarget as HTMLButtonElement).style.color = "#fff";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
-                  "transparent";
-                (e.currentTarget as HTMLButtonElement).style.color =
-                  "rgba(255,255,255,0.35)";
-              }}>
+                (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+                (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.35)";
+              }}
+            >
               <X size={15} strokeWidth={1.5} aria-hidden="true" />
             </button>
           </div>
@@ -203,14 +225,16 @@ export default function TradeModal() {
           {/* Scrollable body */}
           <div
             className="overflow-y-auto flex-1 px-5 py-4 space-y-4"
-            style={{ scrollbarWidth: "none" }}>
+            style={{ scrollbarWidth: "none" }}
+          >
             {/* Symbol input if no preset */}
             {!tradeSymbol && (
               <div className="flex flex-col gap-1.5">
                 <label
                   htmlFor="trade-symbol"
                   className="text-xs font-semibold"
-                  style={{ color: "rgba(255,255,255,0.4)" }}>
+                  style={{ color: "rgba(255,255,255,0.4)" }}
+                >
                   Stock Symbol
                 </label>
                 <input
@@ -225,13 +249,11 @@ export default function TradeModal() {
                     border: "1px solid rgba(255,255,255,0.08)",
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.border =
-                      "1px solid rgba(99,102,241,0.5)";
+                    e.currentTarget.style.border = "1px solid rgba(99,102,241,0.5)";
                     e.currentTarget.style.background = "rgba(255,255,255,0.07)";
                   }}
                   onBlur={(e) => {
-                    e.currentTarget.style.border =
-                      "1px solid rgba(255,255,255,0.08)";
+                    e.currentTarget.style.border = "1px solid rgba(255,255,255,0.08)";
                     e.currentTarget.style.background = "rgba(255,255,255,0.05)";
                   }}
                 />
@@ -243,7 +265,8 @@ export default function TradeModal() {
               className="grid grid-cols-2 gap-1 p-1 rounded-xl"
               style={{ background: "rgba(255,255,255,0.05)" }}
               role="group"
-              aria-label="Trade type">
+              aria-label="Trade type"
+            >
               {(["BUY", "SELL"] as TradeType[]).map((type) => (
                 <button
                   key={type}
@@ -253,61 +276,50 @@ export default function TradeModal() {
                   style={
                     tradeType === type
                       ? type === "BUY"
-                        ? {
-                            background: "rgba(16,185,129,0.15)",
-                            color: "#10b981",
-                            border: "1px solid rgba(16,185,129,0.25)",
-                          }
-                        : {
-                            background: "rgba(239,68,68,0.15)",
-                            color: "#ef4444",
-                            border: "1px solid rgba(239,68,68,0.25)",
-                          }
-                      : {
-                          color: "rgba(255,255,255,0.35)",
-                          border: "1px solid transparent",
-                        }
-                  }>
-                  {type === "BUY" ? (
-                    <TrendingUp
-                      size={13}
-                      strokeWidth={1.5}
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <TrendingDown
-                      size={13}
-                      strokeWidth={1.5}
-                      aria-hidden="true"
-                    />
-                  )}
+                        ? { background: "rgba(16,185,129,0.15)", color: "#10b981", border: "1px solid rgba(16,185,129,0.25)" }
+                        : { background: "rgba(239,68,68,0.15)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.25)" }
+                      : { color: "rgba(255,255,255,0.35)", border: "1px solid transparent" }
+                  }
+                >
+                  {type === "BUY"
+                    ? <TrendingUp size={13} strokeWidth={1.5} aria-hidden="true" />
+                    : <TrendingDown size={13} strokeWidth={1.5} aria-hidden="true" />
+                  }
                   {type}
                 </button>
               ))}
             </div>
 
+            {/* Owned shares hint when selling */}
+            {tradeType === "SELL" && (
+              <div
+                className="flex items-center justify-between px-4 py-2.5 rounded-xl"
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
+              >
+                <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+                  You own
+                </span>
+                <span
+                  className="font-mono text-sm font-semibold"
+                  style={{ color: ownedShares > 0 ? "#fff" : "#ef4444" }}
+                >
+                  {ownedShares} share{ownedShares !== 1 ? "s" : ""}
+                </span>
+              </div>
+            )}
+
             {/* Market price */}
             <div
               className="flex items-center justify-between px-4 py-2.5 rounded-xl"
-              style={{
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.06)",
-              }}>
-              <span
-                className="text-xs"
-                style={{ color: "rgba(255,255,255,0.4)" }}>
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
+            >
+              <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
                 Market Price
               </span>
               {quoteLoading ? (
-                <div
-                  className="w-20 h-4 rounded animate-pulse"
-                  style={{ background: "rgba(255,255,255,0.08)" }}
-                />
+                <div className="w-20 h-4 rounded animate-pulse" style={{ background: "rgba(255,255,255,0.08)" }} />
               ) : (
-                <span
-                  className="font-mono text-sm font-semibold text-white"
-                  aria-live="polite"
-                  aria-atomic="true">
+                <span className="font-mono text-sm font-semibold text-white" aria-live="polite" aria-atomic="true">
                   {quote ? formatUSD(quote.price) : "—"}
                 </span>
               )}
@@ -318,40 +330,30 @@ export default function TradeModal() {
               <label
                 htmlFor="trade-shares"
                 className="text-xs font-semibold"
-                style={{ color: "rgba(255,255,255,0.4)" }}>
+                style={{ color: "rgba(255,255,255,0.4)" }}
+              >
                 Shares
               </label>
               <div
                 className="flex items-center gap-2 px-2 py-1.5 rounded-xl"
-                style={{
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                }}>
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
+              >
                 <button
                   onClick={decrement}
                   aria-label="Decrease shares by 1"
                   className="w-8 h-8 flex items-center justify-center rounded-lg transition-all active:scale-90 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-500 shrink-0"
-                  style={{
-                    background: "rgba(255,255,255,0.07)",
-                    color: "rgba(255,255,255,0.6)",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background =
-                      "rgba(255,255,255,0.12)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background =
-                      "rgba(255,255,255,0.07)";
-                  }}>
+                  style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)" }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.12)"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.07)"; }}
+                >
                   <Minus size={13} strokeWidth={2} aria-hidden="true" />
                 </button>
                 <input
                   ref={inputRef}
                   id="trade-shares"
                   type="text"
-                  min="1"
-                  step="1"
-                  value={shares}
+                  inputMode="decimal"
+                  value={sharesInput}
                   onChange={handleSharesChange}
                   className="flex-1 bg-transparent text-center font-mono text-xl font-bold text-white focus:outline-none"
                   aria-label="Number of shares"
@@ -360,18 +362,10 @@ export default function TradeModal() {
                   onClick={increment}
                   aria-label="Increase shares by 1"
                   className="w-8 h-8 flex items-center justify-center rounded-lg transition-all active:scale-90 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-500 shrink-0"
-                  style={{
-                    background: "rgba(255,255,255,0.07)",
-                    color: "rgba(255,255,255,0.6)",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background =
-                      "rgba(255,255,255,0.12)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background =
-                      "rgba(255,255,255,0.07)";
-                  }}>
+                  style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)" }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.12)"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.07)"; }}
+                >
                   <Plus size={13} strokeWidth={2} aria-hidden="true" />
                 </button>
               </div>
@@ -381,36 +375,26 @@ export default function TradeModal() {
                 {[1, 5, 10, 25].map((n) => (
                   <button
                     key={n}
-                    onClick={() => setShares(n)}
+                    onClick={() => setSharesInput(String(n))}
                     className="py-1.5 rounded-lg text-xs font-semibold transition-all focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-500"
                     style={
-                      shares === n
-                        ? {
-                            background: "rgba(99,102,241,0.15)",
-                            color: "#a5b4fc",
-                            border: "1px solid rgba(99,102,241,0.3)",
-                          }
-                        : {
-                            color: "rgba(255,255,255,0.35)",
-                            border: "1px solid rgba(255,255,255,0.08)",
-                          }
+                      parseFloat(sharesInput) === n
+                        ? { background: "rgba(99,102,241,0.15)", color: "#a5b4fc", border: "1px solid rgba(99,102,241,0.3)" }
+                        : { color: "rgba(255,255,255,0.35)", border: "1px solid rgba(255,255,255,0.08)" }
                     }
                     onMouseEnter={(e) => {
-                      if (shares !== n) {
-                        (e.currentTarget as HTMLButtonElement).style.color =
-                          "rgba(255,255,255,0.65)";
-                        (e.currentTarget as HTMLButtonElement).style.border =
-                          "1px solid rgba(255,255,255,0.15)";
+                      if (parseFloat(sharesInput) !== n) {
+                        (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.65)";
+                        (e.currentTarget as HTMLButtonElement).style.border = "1px solid rgba(255,255,255,0.15)";
                       }
                     }}
                     onMouseLeave={(e) => {
-                      if (shares !== n) {
-                        (e.currentTarget as HTMLButtonElement).style.color =
-                          "rgba(255,255,255,0.35)";
-                        (e.currentTarget as HTMLButtonElement).style.border =
-                          "1px solid rgba(255,255,255,0.08)";
+                      if (parseFloat(sharesInput) !== n) {
+                        (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.35)";
+                        (e.currentTarget as HTMLButtonElement).style.border = "1px solid rgba(255,255,255,0.08)";
                       }
-                    }}>
+                    }}
+                  >
                     {n}
                   </button>
                 ))}
@@ -418,15 +402,10 @@ export default function TradeModal() {
             </div>
 
             {/* Summary rows */}
-            <div
-              className="rounded-xl overflow-hidden"
-              style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
+            <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
               {[
-                { label: "Shares", value: shares.toString() },
-                {
-                  label: "Price per share",
-                  value: quote ? formatUSD(quote.price) : "—",
-                },
+                { label: "Shares", value: shares > 0 ? shares.toString() : "—" },
+                { label: "Price per share", value: quote ? formatUSD(quote.price) : "—" },
                 {
                   label: tradeType === "BUY" ? "Total cost" : "Total value",
                   value: formatUSD(totalCost),
@@ -442,21 +421,15 @@ export default function TradeModal() {
                   key={label}
                   className="flex items-center justify-between px-4 py-2.5"
                   style={{
-                    background:
-                      i % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent",
-                    borderBottom:
-                      i < arr.length - 1
-                        ? "1px solid rgba(255,255,255,0.05)"
-                        : "none",
-                  }}>
-                  <span
-                    className="text-xs"
-                    style={{ color: "rgba(255,255,255,0.4)" }}>
-                    {label}
-                  </span>
+                    background: i % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent",
+                    borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none",
+                  }}
+                >
+                  <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{label}</span>
                   <span
                     className="font-mono text-xs font-semibold"
-                    style={{ color: warn ? "#ef4444" : (color ?? "#fff") }}>
+                    style={{ color: warn ? "#ef4444" : (color ?? "#fff") }}
+                  >
                     {value}
                   </span>
                 </div>
@@ -464,51 +437,40 @@ export default function TradeModal() {
             </div>
 
             {/* Errors */}
-            {(errorMessage ||
-              (!canAfford && tradeType === "BUY" && totalCost > 0)) && (
+            {(errorMessage || (!canAfford && tradeType === "BUY" && totalCost > 0) || sellError) && (
               <div
                 className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs"
-                style={{
-                  background: "rgba(239,68,68,0.08)",
-                  border: "1px solid rgba(239,68,68,0.2)",
-                  color: "#f87171",
-                }}
-                role="alert">
+                style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171" }}
+                role="alert"
+              >
                 <span aria-hidden="true">⚠</span>
-                {errorMessage ?? "Insufficient balance for this trade"}
+                {errorMessage ?? sellError ?? "Insufficient balance for this trade"}
               </div>
             )}
           </div>
 
           {/* Footer */}
-          <div
-            className="px-5 py-4 shrink-0"
-            style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+          <div className="px-5 py-4 shrink-0" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
             <button
               onClick={handleSubmit}
-              disabled={
-                isPending || !quote || !quote.price || shares <= 0 || !canAfford
-              }
+              disabled={submitDisabled}
               className="w-full py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-[0.98] disabled:active:scale-100 disabled:opacity-40 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
               style={{
-                background:
-                  tradeType === "BUY"
-                    ? "linear-gradient(135deg,#059669,#10b981)"
-                    : "linear-gradient(135deg,#dc2626,#ef4444)",
-              }}>
+                background: tradeType === "BUY"
+                  ? "linear-gradient(135deg,#059669,#10b981)"
+                  : "linear-gradient(135deg,#dc2626,#ef4444)",
+              }}
+            >
               {isPending ? (
                 <span className="flex items-center justify-center gap-2">
                   <span
                     className="w-4 h-4 rounded-full border-2 animate-spin"
-                    style={{
-                      borderColor: "rgba(255,255,255,0.4)",
-                      borderTopColor: "transparent",
-                    }}
+                    style={{ borderColor: "rgba(255,255,255,0.4)", borderTopColor: "transparent" }}
                   />
                   Processing...
                 </span>
               ) : (
-                `${tradeType} ${shares} ${shares === 1 ? "Share" : "Shares"} · ${formatUSD(totalCost)}`
+                `${tradeType} ${shares > 0 ? shares : "—"} ${shares === 1 ? "Share" : "Shares"} · ${formatUSD(totalCost)}`
               )}
             </button>
           </div>

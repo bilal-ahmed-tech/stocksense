@@ -156,7 +156,7 @@ export default function Alerts() {
                   aria-label="Stock symbol"
                   aria-expanded={showResults}
                   aria-haspopup="listbox"
-                  className="flex-1 bg-transparent text-sm font-mono text-white placeholder:text-white/20 focus:outline-none"
+                  className="flex-1 max-w-[89] bg-transparent text-sm font-mono text-white placeholder:text-white/20 focus:outline-none"
                 />
                 {searching && (
                   <div

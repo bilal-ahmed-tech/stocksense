@@ -37,6 +37,7 @@ export interface Transaction {
   _id: string;
   userId: string;
   symbol: string;
+  name: string;
   type: TradeType;
   shares: number;
   priceAtTime: number;
@@ -54,14 +55,17 @@ export interface StockQuote {
   high: number;
   low: number;
   volume: number;
-  marketCap: number | null;
-  peRatio: number | null;
-  weekHigh52: number;
-  weekLow52: number;
+  marketCap?: number;
+  peRatio?: number;
+  weekHigh52?: number;
+  weekLow52?: number;
+  exchange?: string;
+  currency?: string;
 }
 
+// Finnhub candle shape — field is "time" not "timestamp"
 export interface StockChartPoint {
-  timestamp: string;
+  time: string;
   open: number;
   high: number;
   low: number;
@@ -69,13 +73,17 @@ export interface StockChartPoint {
   volume: number;
 }
 
+// Finnhub news shape — field is "headline" not "title"
+// sentiment not provided by Finnhub — optional for backwards compat
 export interface StockNewsItem {
-  title: string;
-  url: string;
+  id: string;
+  headline: string;
   summary: string;
   source: string;
+  url: string;
   publishedAt: string;
-  sentiment:
+  image: string;
+  sentiment?:
     | "Bullish"
     | "Bearish"
     | "Neutral"
@@ -83,12 +91,12 @@ export interface StockNewsItem {
     | "Somewhat-Bearish";
 }
 
+// Finnhub search shape — "exchange" replaces "region" + "currency"
 export interface StockSearchResult {
   symbol: string;
   name: string;
   type: string;
-  region: string;
-  currency: string;
+  exchange: string;
 }
 
 export interface Watchlist {
@@ -110,6 +118,7 @@ export interface Alert {
   notifiedAt: string | null;
   createdAt: string;
 }
+
 export interface ApiSuccess<T> {
   success: true;
   data: T;
@@ -128,12 +137,9 @@ export interface PerformancePoint {
 }
 
 export interface PortfolioPerformance {
-  totalValue: number;
   totalInvested: number;
-  totalPnl: number;
-  totalPnlPercent: number;
-  dayChange: number;
-  dayChangePercent: number;
+  currentBalance: number;
+  totalHoldings: number;
   chart: PerformancePoint[];
 }
 
