@@ -21,7 +21,7 @@ const env = validateEnv();
 
 const app = express();
 const httpServer = createServer(app);
-
+app.set("trust proxy", 1);
 app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
