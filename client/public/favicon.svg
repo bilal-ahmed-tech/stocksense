@@ -1,11 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 680" role="img" style="max-width: 680px; display: block; margin-inline: auto;">
-  <title>StockSense favicon</title>
-  <desc>Indigo rounded square with a white upward trending arrow, matching the StockSense navbar logo</desc>
-
-  <rect x="140" y="140" width="400" height="400" rx="100" fill="#4f46e5"></rect>
-
-  <polyline points="210,430 300,340 360,390 450,270 470,250" fill="none" stroke="white" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"></polyline>
-
-  <polyline points="390,230 470,230 470,310" fill="none" stroke="white" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"></polyline>
-
-</svg>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 629.5 629.5"><defs><style>.cls-1{fill:#4f46e5;}.cls-2{fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:36px;}</style></defs><rect class="cls-1" width="629.5" height="629.5" rx="157.375"/><polyline class="cls-2" points="110.162 456.388 251.8 314.75 346.225 393.438 487.863 204.588 519.338 173.113"/><polyline class="cls-2" points="393.438 141.638 519.338 141.638 519.338 267.537"/></svg>
