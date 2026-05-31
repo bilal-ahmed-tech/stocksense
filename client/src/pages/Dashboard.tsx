@@ -109,7 +109,7 @@ export default function Dashboard() {
   const holdings = portfolio?.holdings ?? [];
 
   // ─── Live P&L calculated client-side using Finnhub prices ────────────────
-  const { quotes } = useStockQuotes(holdings.map((h) => h.symbol));
+  const { quotes, isLoading: quotesLoading } = useStockQuotes(holdings.map((h) => h.symbol));
 
   const livePortfolioValue = holdings.reduce((sum, h) => {
     const price = quotes[h.symbol]?.price ?? h.avgBuyPrice;
@@ -180,7 +180,7 @@ export default function Dashboard() {
               icon={<BriefcaseBusiness size={16} strokeWidth={1.5} />}
               iconBg="rgba(99,102,241,0.15)"
               iconColor="#818cf8"
-              loading={perfLoading}
+              loading={perfLoading || quotesLoading}
             />
             <StatCard
               label="Total P&L"
@@ -198,7 +198,7 @@ export default function Dashboard() {
               }
               iconColor={isPositive ? "#10b981" : "#ef4444"}
               valueColor={isPositive ? "#10b981" : "#ef4444"}
-              loading={perfLoading}
+              loading={perfLoading || quotesLoading}
             />
             <StatCard
               label="Total Invested"
