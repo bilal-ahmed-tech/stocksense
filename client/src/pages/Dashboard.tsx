@@ -228,7 +228,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
         <section
           aria-label="Portfolio performance chart"
-          className="rounded-2xl p-6"
+          className="rounded-2xl p-6 overflow-hidden"
           style={{
             background: "#0e0e10",
             border: "1px solid rgba(255,255,255,0.07)",
@@ -257,7 +257,7 @@ export default function Dashboard() {
 
         <section
           aria-label="Asset allocation"
-          className="rounded-2xl p-6"
+          className="rounded-2xl p-6 overflow-hidden"
           style={{
             background: "#0e0e10",
             border: "1px solid rgba(255,255,255,0.07)",
