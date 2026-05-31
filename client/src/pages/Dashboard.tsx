@@ -60,6 +60,8 @@ function ChartTooltip({
         borderRadius: 10,
         padding: "10px 14px",
         boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+        maxWidth: 160,
+        pointerEvents: "none",
       }}
     >
       <p
@@ -132,7 +134,7 @@ export default function Dashboard() {
   };
 
   return (
-    <main className="sm:space-y-4 lg:space-y-6">
+    <div className="sm:space-y-4 lg:space-y-6 space-y-4">
       <title>Dashboard — StockSense</title>
 
       {/* Header */}
@@ -230,6 +232,8 @@ export default function Dashboard() {
           style={{
             background: "#0e0e10",
             border: "1px solid rgba(255,255,255,0.07)",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
           <div className="flex items-center justify-between mb-6">
@@ -386,7 +390,7 @@ export default function Dashboard() {
           )}
         </section>
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -530,6 +534,8 @@ function PerformanceChart({ chart }: { chart: PerformancePoint[] }) {
           <Tooltip
             content={<ChartTooltip />}
             cursor={{ stroke: "rgba(255,255,255,0.06)", strokeWidth: 1 }}
+            position={{ y: 0 }}
+            wrapperStyle={{ zIndex: 10 }}
           />
           <Area
             type="monotone"
