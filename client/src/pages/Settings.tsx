@@ -341,7 +341,7 @@ export default function Settings() {
           <button
             onClick={handlePasswordChange}
             disabled={passwordLoading}
-            className="mt-1 px-5 py-2.5 text-sm font-semibold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40 disabled:active:scale-100 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+            className="mt-1 px-5 py-2.5 cursor-pointer text-sm font-semibold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40 disabled:active:scale-100 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
             style={{ background: "#4f46e5" }}
           >
             {passwordLoading ? "Changing..." : "Change Password"}
@@ -419,7 +419,7 @@ export default function Settings() {
             </div>
             <button
               onClick={() => setShowResetConfirm(true)}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ml-4 shrink-0"
+              className="flex items-center cursor-pointer gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ml-4 shrink-0"
               style={{
                 color: "rgba(255,255,255,0.5)",
                 border: "1px solid rgba(255,255,255,0.1)",
@@ -455,7 +455,7 @@ export default function Settings() {
             </div>
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ml-4 shrink-0"
+              className="flex items-center cursor-pointer gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ml-4 shrink-0"
               style={{
                 color: "#f87171",
                 border: "1px solid rgba(239,68,68,0.25)",
@@ -578,7 +578,7 @@ function AvatarUpload() {
           </p>
           <button
             onClick={() => setShowModal(true)}
-            className="text-xs mt-1.5 font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-500 rounded"
+            className="text-xs mt-1.5 cursor-pointer font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-500 rounded"
             style={{ color: "#818cf8" }}
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLButtonElement).style.color = "#a5b4fc";

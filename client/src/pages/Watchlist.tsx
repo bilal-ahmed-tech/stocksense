@@ -20,6 +20,18 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { formatUSD, formatPercent } from "@/lib/formatters";
 import ErrorCard from "@/components/ui/ErrorCard";
 
+// Types
+interface StockSearchResult {
+  symbol: string;
+  name: string;
+}
+
+interface IconProps {
+  size?: number;
+  strokeWidth?: number;
+  className?: string;
+}
+
 export default function Watchlist() {
   const [query, setQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
@@ -32,8 +44,7 @@ export default function Watchlist() {
     isError: watchlistError,
     refetch: refetchWatchlist,
   } = useWatchlist();
-  const { data: searchResults, isLoading: searching } =
-    useStockSearch(debouncedQuery);
+  const { data: searchResults, isLoading: searching } = useStockSearch(debouncedQuery);
   const { mutate: addSymbol, isPending: adding } = useAddToWatchlist();
   const { mutate: removeSymbol } = useRemoveFromWatchlist();
 
@@ -98,7 +109,7 @@ export default function Watchlist() {
               type="text"
               value={query}
               onChange={(e) => {
-                setQuery(e.target.value);
+                setQuery(e.target.value.toUpperCase());
                 setShowResults(true);
               }}
               onFocus={() => setShowResults(true)}
@@ -107,7 +118,7 @@ export default function Watchlist() {
               aria-label="Search stocks"
               aria-expanded={showResults}
               aria-haspopup="listbox"
-              className="flex-1 bg-transparent text-sm text-white placeholder:text-white/20 focus:outline-none"
+              className="flex-1 bg-transparent text-sm text-white placeholder:text-white/20 focus:outline-none "
             />
             {searching && (
               <div
@@ -145,68 +156,17 @@ export default function Watchlist() {
                 boxShadow: "0 16px 48px rgba(0,0,0,0.6)",
               }}
             >
-              {searchResults.slice(0, 6).map((result) => {
-                const isWatched = watchlist?.symbols.includes(result.symbol);
+              {searchResults.slice(0, 6).map((result: StockSearchResult) => {
+                const isWatched = watchlist?.symbols?.includes(result.symbol) ?? false;
                 return (
-                  <button
+                  <SearchResultItem
                     key={result.symbol}
-                    role="option"
-                    aria-selected={isWatched}
-                    onClick={() => !isWatched && handleAdd(result.symbol)}
-                    disabled={adding || isWatched}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-left transition-all focus-visible:outline-none disabled:cursor-default"
-                    style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
-                    onMouseEnter={(e) => {
-                      if (!isWatched)
-                        (e.currentTarget as HTMLButtonElement).style.background =
-                          "rgba(255,255,255,0.04)";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLButtonElement).style.background =
-                        "transparent";
-                    }}
-                  >
-                    <div
-                      className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0"
-                      style={{
-                        background: "rgba(99,102,241,0.12)",
-                        color: "#818cf8",
-                      }}
-                    >
-                      {result.symbol.slice(0, 2)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-mono text-sm font-semibold text-white">
-                        {result.symbol}
-                      </p>
-                      <p
-                        className="text-xs truncate"
-                        style={{ color: "rgba(255,255,255,0.35)" }}
-                      >
-                        {result.name}
-                      </p>
-                    </div>
-                    <div className="shrink-0">
-                      {isWatched ? (
-                        <span
-                          className="text-xs font-semibold"
-                          style={{ color: "#818cf8" }}
-                        >
-                          Watching
-                        </span>
-                      ) : (
-                        <div
-                          className="w-7 h-7 rounded-lg flex items-center justify-center"
-                          style={{
-                            background: "rgba(99,102,241,0.12)",
-                            color: "#818cf8",
-                          }}
-                        >
-                          <Plus size={14} strokeWidth={2} aria-hidden="true" />
-                        </div>
-                      )}
-                    </div>
-                  </button>
+                    symbol={result.symbol}
+                    name={result.name}
+                    isWatched={isWatched}
+                    onAdd={() => handleAdd(result.symbol)}
+                    adding={adding}
+                  />
                 );
               })}
             </div>
@@ -280,7 +240,7 @@ export default function Watchlist() {
             </div>
 
             <ul role="list">
-              {watchlist.symbols.map((symbol, i) => (
+              {watchlist.symbols.map((symbol: string, i: number) => (
                 <WatchlistItem
                   key={symbol}
                   symbol={symbol}
@@ -297,35 +257,152 @@ export default function Watchlist() {
   );
 }
 
+// ─── Search Result Item (with price) ─────────────────────────────────────────
+
+interface SearchResultItemProps {
+  symbol: string;
+  name: string;
+  isWatched: boolean;
+  onAdd: () => void;
+  adding: boolean;
+}
+
+function SearchResultItem({
+  symbol,
+  name,
+  isWatched,
+  onAdd,
+  adding,
+}: SearchResultItemProps) {
+  const { data: quote, isLoading: quoteLoading } = useStock(symbol);
+  const isPositive = (quote?.changePercent ?? 0) >= 0;
+
+  return (
+    <button
+      role="option"
+      aria-selected={isWatched}
+      onClick={() => !isWatched && onAdd()}
+      disabled={adding || isWatched}
+      className="w-full flex items-center gap-3 px-4 py-3 text-left transition-all focus-visible:outline-none disabled:cursor-default hover:bg-white/5"
+      style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+    >
+      {/* Symbol icon */}
+      <div
+        className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0"
+        style={{
+          background: "rgba(99,102,241,0.12)",
+          color: "#818cf8",
+        }}
+      >
+        {symbol.slice(0, 2)}
+      </div>
+
+      {/* Stock info */}
+      <div className="flex-1 min-w-0">
+        <p className="font-mono text-sm font-semibold text-white">
+          {symbol}
+        </p>
+        <p
+          className="text-xs truncate"
+          style={{ color: "rgba(255,255,255,0.35)" }}
+        >
+          {name}
+        </p>
+      </div>
+
+      {/* Price and change */}
+      <div className="shrink-0 text-right">
+        {quoteLoading ? (
+          <div
+            className="h-8 w-24 rounded-lg animate-pulse"
+            style={{ background: "rgba(255,255,255,0.06)" }}
+          />
+        ) : quote ? (
+          <>
+            <p className="font-mono text-sm font-semibold text-white">
+              {formatUSD(quote.price)}
+            </p>
+            <div className="flex items-center gap-1 justify-end">
+              {isPositive ? (
+                <TrendingUp size={10} strokeWidth={2} style={{ color: "#10b981" }} />
+              ) : (
+                <TrendingDown size={10} strokeWidth={2} style={{ color: "#ef4444" }} />
+              )}
+              <span
+                className="text-xs font-mono"
+                style={{ color: isPositive ? "#10b981" : "#ef4444" }}
+              >
+                {formatPercent(quote.changePercent)}
+              </span>
+            </div>
+          </>
+        ) : (
+          <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+            No data
+          </p>
+        )}
+      </div>
+
+      {/* Add/Watching button */}
+      <div className="shrink-0 w-16 text-right">
+        {isWatched ? (
+          <span
+            className="text-xs font-semibold inline-flex items-center gap-1"
+            style={{ color: "#818cf8" }}
+          >
+            <Check size={12} strokeWidth={2} />
+            Watching
+          </span>
+        ) : (
+          <div
+            className="w-7 h-7 rounded-lg flex items-center justify-center ml-auto transition-all hover:scale-105"
+            style={{
+              background: "rgba(99,102,241,0.12)",
+              color: "#818cf8",
+            }}
+          >
+            {adding ? (
+              <div
+                className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin"
+                style={{
+                  borderColor: "#818cf8",
+                  borderTopColor: "transparent",
+                }}
+              />
+            ) : (
+              <Plus size={14} strokeWidth={2} aria-hidden="true" />
+            )}
+          </div>
+        )}
+      </div>
+    </button>
+  );
+}
+
 // ─── Watchlist Item ───────────────────────────────────────────────────────────
+
+interface WatchlistItemProps {
+  symbol: string;
+  isLast: boolean;
+  onRemove: () => void;
+  onClick: () => void;
+}
 
 function WatchlistItem({
   symbol,
   isLast,
   onRemove,
   onClick,
-}: {
-  symbol: string;
-  isLast: boolean;
-  onRemove: () => void;
-  onClick: () => void;
-}) {
+}: WatchlistItemProps) {
   const { data: quote, isLoading } = useStock(symbol);
   const isPositive = (quote?.changePercent ?? 0) >= 0;
 
   return (
     <li
-      className="group grid items-center px-5 py-4 transition-all"
+      className="group grid items-center px-5 py-4 transition-all hover:bg-white/5"
       style={{
         gridTemplateColumns: "1fr 120px 130px 40px",
         borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.04)",
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLLIElement).style.background =
-          "rgba(255,255,255,0.025)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLLIElement).style.background = "transparent";
       }}
     >
       {/* Stock info */}
@@ -485,5 +562,25 @@ function EmptyWatchlist() {
         </p>
       </div>
     </div>
+  );
+}
+
+// ─── Helper Components ────────────────────────────────────────────────────────
+
+function Check({ size = 16, strokeWidth = 2, className = "" }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
   );
 }

@@ -22,7 +22,7 @@ export default function Navbar() {
 
   return (
     <header
-      className="fixed top-0 right-0 left-0 h-14 z-30 flex items-center px-4 gap-4"
+      className="fixed top-0 right-0 left-0 p-6 h-14 z-30 flex items-center px-4 gap-4"
       style={{
         background: "rgba(9,9,11,0.85)",
         backdropFilter: "blur(12px)",
@@ -45,7 +45,7 @@ export default function Navbar() {
           (e.currentTarget as HTMLButtonElement).style.color =
             "rgba(255,255,255,0.45)";
         }}>
-        <Menu size={18} strokeWidth={1.5} aria-hidden="true" />
+        <Menu size={20} strokeWidth={1.5} aria-hidden="true" className="cursor-pointer" />
       </button>
 
       {/* Search — centered */}
@@ -93,7 +93,7 @@ export default function Navbar() {
           onClick={() => logout()}
           disabled={isPending}
           aria-label="Log out"
-          className="w-8 h-8 flex items-center justify-center rounded-lg transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:opacity-50"
+          className="w-8 h-8 flex items-center cursor-pointer justify-center rounded-lg transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:opacity-50"
           style={{ color: "rgba(255,255,255,0.4)" }}
           onMouseEnter={(e) => {
             (e.currentTarget as HTMLButtonElement).style.background =

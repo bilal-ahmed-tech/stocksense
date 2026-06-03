@@ -97,7 +97,7 @@ export default function Portfolio() {
             aria-selected={activeTab === id}
             aria-controls={`${id}-panel`}
             onClick={() => setActiveTab(id)}
-            className="flex flex-1 sm:flex-none items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+            className="flex flex-1 cursor-pointer sm:flex-none items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
             style={
               activeTab === id
                 ? { background: "#4f46e5", color: "#fff" }
@@ -130,7 +130,7 @@ export default function Portfolio() {
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                  className="px-3 py-1.5 rounded-lg cursor-pointer text-xs font-semibold transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                   style={
                     filter === f
                       ? f === "gain"

@@ -33,33 +33,58 @@ export default function Sidebar() {
   const user = useSelector((s: RootState) => s.auth.user);
   const navigate = useNavigate();
 
-  const [isMobile, setIsMobile] = useState(
-    () => window.innerWidth < MOBILE_BREAKPOINT
-  );
+  const [isMobile, setIsMobile] = useState(false);
+  const [isMounted, setIsMounted] = useState(false); // Add this to track mount state
   const prevIsMobile = useRef(isMobile);
+  const isInitialMount = useRef(true);
+
+  // Initialize isMobile on mount with window check
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const mobile = window.innerWidth < MOBILE_BREAKPOINT;
+      setIsMobile(mobile);
+      
+      // Set sidebar closed by default on mobile
+      if (mobile && isInitialMount.current) {
+        setSidebarOpen(false);
+      }
+      isInitialMount.current = false;
+      
+      // Mark component as mounted after a tiny delay to prevent transition flash
+      setTimeout(() => {
+        setIsMounted(true);
+      }, 50);
+    }
+  }, [setSidebarOpen]);
 
   // Breakpoint detection
- useEffect(() => {
-  function handleResize() {
-    const mobile = window.innerWidth < MOBILE_BREAKPOINT;
+  useEffect(() => {
+    function handleResize() {
+      const mobile = window.innerWidth < MOBILE_BREAKPOINT;
 
-    // update isMobile only if it actually changed
-    setIsMobile((prev) => {
-      if (prev === mobile) return prev;
-      return mobile;
-    });
+      setIsMobile((prev) => {
+        if (prev === mobile) return prev;
+        return mobile;
+      });
 
-    // close sidebar ONLY when breakpoint actually changes
-    if (prevIsMobile.current !== mobile) {
+      // Close sidebar when switching to mobile
+      if (!prevIsMobile.current && mobile) {
+        setSidebarOpen(false);
+      }
+      
+      // Open sidebar when switching to desktop
+      if (prevIsMobile.current && !mobile && isInitialMount.current === false) {
+        setSidebarOpen(true);
+      }
+
       prevIsMobile.current = mobile;
-      setSidebarOpen(false);
     }
-  }
 
-  window.addEventListener("resize", handleResize, { passive: true });
+    window.addEventListener("resize", handleResize, { passive: true });
+    handleResize();
 
-  return () => window.removeEventListener("resize", handleResize);
-}, [setSidebarOpen]);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [setSidebarOpen]);
 
   // Swipe to close on mobile
   useEffect(() => {
@@ -74,7 +99,6 @@ export default function Sidebar() {
     function onTouchEnd(e: TouchEvent) {
       const endX = e.changedTouches[0].clientX;
       const diff = startX - endX;
-      // Swipe left more than 60px → close
       if (diff > 60 && sidebarOpen) {
         setSidebarOpen(false);
       }
@@ -97,7 +121,14 @@ export default function Sidebar() {
         .slice(0, 2)
     : "?";
 
-  const sidebarWidth = sidebarOpen ? 224 : isMobile ? 0 : 64;
+  const getSidebarWidth = () => {
+    if (isMobile) {
+      return sidebarOpen ? 280 : 0;
+    }
+    return sidebarOpen ? 224 : 64;
+  };
+
+  const sidebarWidth = getSidebarWidth();
   const isHidden = sidebarWidth === 0;
 
   return (
@@ -114,17 +145,21 @@ export default function Sidebar() {
 
       <aside
         aria-label="Main navigation"
-        className="fixed top-0 left-0 h-full z-20 flex flex-col select-none"
+        className={`fixed top-0 left-0 h-full z-20 flex flex-col select-none ${
+          isMobile ? "shadow-2xl" : ""
+        }`}
         style={{
           width: sidebarWidth,
           background: "linear-gradient(180deg, #0c0c0f 0%, #09090b 100%)",
           borderRight: isHidden ? "none" : "1px solid rgba(255,255,255,0.06)",
-          transition: "width 280ms cubic-bezier(0.4, 0, 0.2, 1)",
+          // Only apply transition after component mounts to prevent initial flash
+          transition: isMounted ? "width 280ms cubic-bezier(0.4, 0, 0.2, 1)" : "none",
           overflowX: "hidden",
           visibility: isHidden ? "hidden" : "visible",
           pointerEvents: isHidden ? "none" : "auto",
         }}
       >
+        {/* Rest of your sidebar content remains the same */}
         {/* ── Logo row ─────────────────────────────────────── */}
         <div
           className="flex items-center h-14 px-3 shrink-0"
@@ -186,7 +221,7 @@ export default function Sidebar() {
           )}
         </div>
 
-        {/* ── Nav links ─────────────────────────────────────── */}
+        {/* Nav links */}
         <nav className="flex-1 p-2 flex flex-col gap-0.5 overflow-y-auto overflow-x-hidden">
           {sidebarOpen && (
             <p
@@ -259,7 +294,6 @@ export default function Sidebar() {
                       {label}
                     </span>
                   )}
-                  {/* Tooltip — desktop collapsed only */}
                   {!sidebarOpen && !isMobile && (
                     <span
                       className="absolute left-full ml-3 px-3 py-1.5 rounded-lg text-xs font-semibold text-white whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 z-50"
@@ -286,7 +320,7 @@ export default function Sidebar() {
           ))}
         </nav>
 
-        {/* ── Bottom section ────────────────────────────────── */}
+        {/* Bottom section */}
         <div
           className="p-2 flex flex-col gap-0.5 shrink-0"
           style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
@@ -372,68 +406,72 @@ export default function Sidebar() {
           </NavLink>
 
           {/* User card */}
-          <div
-            className="flex items-center justify-center gap-2.5 px-3 py-2.5 rounded-xl mt-1"
-            style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.06)",
-            }}
-          >
-            {user?.avatar ? (
-              <img
-                src={user.avatar}
-                alt={user?.name ?? "User avatar"}
-                className="w-7 h-7 rounded-full object-cover shrink-0 ring-1"
-                style={{ outlineColor: "rgba(255,255,255,0.1)" }}
-              />
-            ) : (
-              <div
-                className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0"
-                style={{
-                  background:
-                    "linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%)",
-                  color: "#fff",
-                  boxShadow: "0 0 12px rgba(79,70,229,0.25)",
-                }}
-              >
-                {initials}
-              </div>
-            )}
-            {sidebarOpen && (
-              <>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[12px] font-semibold text-white truncate leading-none mb-0.5">
-                    {user?.name}
-                  </p>
-                  <p
-                    className="text-[10px] truncate leading-none"
-                    style={{ color: "rgba(255,255,255,0.3)" }}
-                  >
-                    {user?.email}
-                  </p>
-                </div>
-                <button
-                  onClick={() => logout()}
-                  disabled={isPending}
-                  aria-label="Log out"
-                  className="w-6 h-6 flex items-center justify-center rounded-lg transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:opacity-40 shrink-0"
-                  style={{ color: "rgba(255,255,255,0.25)" }}
-                  onMouseEnter={(e) => {
-                    const el = e.currentTarget as HTMLButtonElement;
-                    el.style.background = "rgba(239,68,68,0.12)";
-                    el.style.color = "#f87171";
-                  }}
-                  onMouseLeave={(e) => {
-                    const el = e.currentTarget as HTMLButtonElement;
-                    el.style.background = "transparent";
-                    el.style.color = "rgba(255,255,255,0.25)";
+          {(sidebarOpen || (!isMobile && !sidebarOpen)) && (
+            <div
+              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl mt-1 ${
+                !sidebarOpen && !isMobile ? "justify-center" : ""
+              }`}
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.06)",
+              }}
+            >
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user?.name ?? "User avatar"}
+                  className="w-7 h-7 rounded-full object-cover shrink-0 ring-1"
+                  style={{ outlineColor: "rgba(255,255,255,0.1)" }}
+                />
+              ) : (
+                <div
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0"
+                  style={{
+                    background:
+                      "linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%)",
+                    color: "#fff",
+                    boxShadow: "0 0 12px rgba(79,70,229,0.25)",
                   }}
                 >
-                  <LogOut size={13} strokeWidth={1.5} aria-hidden="true" />
-                </button>
-              </>
-            )}
-          </div>
+                  {initials}
+                </div>
+              )}
+              {sidebarOpen && (
+                <>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[12px] font-semibold text-white truncate leading-none mb-0.5">
+                      {user?.name}
+                    </p>
+                    <p
+                      className="text-[10px] truncate leading-none"
+                      style={{ color: "rgba(255,255,255,0.3)" }}
+                    >
+                      {user?.email}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => logout()}
+                    disabled={isPending}
+                    aria-label="Log out"
+                    className="w-6 h-6 flex items-center cursor-pointer justify-center rounded-lg transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:opacity-40 shrink-0"
+                    style={{ color: "rgba(255,255,255,0.25)" }}
+                    onMouseEnter={(e) => {
+                      const el = e.currentTarget as HTMLButtonElement;
+                      el.style.background = "rgba(239,68,68,0.12)";
+                      el.style.color = "#f87171";
+                    }}
+                    onMouseLeave={(e) => {
+                      const el = e.currentTarget as HTMLButtonElement;
+                      el.style.background = "transparent";
+                      el.style.color = "rgba(255,255,255,0.25)";
+                    }}
+                  >
+                    <LogOut size={13} strokeWidth={1.5} aria-hidden="true" />
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </aside>
     </>

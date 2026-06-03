@@ -154,7 +154,7 @@ export default function Dashboard() {
         </div>
         <button
           onClick={() => openModal("trade")}
-          className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2.5 text-sm font-semibold text-white rounded-xl transition-all active:scale-95 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+          className="flex items-center cursor-pointer gap-1 sm:gap-2 px-2 sm:px-4 py-2.5 text-sm font-semibold text-white rounded-xl transition-all active:scale-95 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
           style={{ background: "#4f46e5" }}
         >
           <Plus size={15} strokeWidth={2.5} aria-hidden="true" />
@@ -323,7 +323,7 @@ export default function Dashboard() {
             </span>
             <button
               onClick={() => navigate("/watchlist")}
-              className="text-xs font-medium transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded"
+              className="text-xs font-medium cursor-pointer transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded"
               style={{ color: "#818cf8" }}
             >
               View all →
@@ -366,7 +366,7 @@ export default function Dashboard() {
             </span>
             <button
               onClick={() => navigate("/portfolio")}
-              className="text-xs font-medium transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded"
+              className="text-xs font-medium transition-colors cursor-pointer hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded"
               style={{ color: "#818cf8" }}
             >
               View all →
