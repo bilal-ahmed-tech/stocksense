@@ -50,13 +50,13 @@ export default function AppLayout() {
   const marginLeft = isMobile ? 0 : sidebarOpen ? 224 : 64;
 
   return (
-    <div className="min-h-screen" style={{ background: "#09090b" }}>
+    <div className="min-h-dvh" style={{ background: "#09090b" }}>
       <Navbar />
       <Sidebar />
       <SocketHandler />
 
       <div
-        className="flex flex-col min-h-screen pt-14 transition-all duration-300"
+        className="flex flex-col min-h-dvh pt-14 transition-all duration-300"
         style={{ marginLeft }}>
         <main className="flex-1 p-2 sm:p-6">
           <ScrollToTop/>
