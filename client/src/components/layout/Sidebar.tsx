@@ -34,23 +34,21 @@ export default function Sidebar() {
   const navigate = useNavigate();
 
   const [isMobile, setIsMobile] = useState(false);
-  const [isMounted, setIsMounted] = useState(false); // Add this to track mount state
+  const [isMounted, setIsMounted] = useState(false);
   const prevIsMobile = useRef(isMobile);
   const isInitialMount = useRef(true);
 
-  // Initialize isMobile on mount with window check
+  // Initialize isMobile on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
       const mobile = window.innerWidth < MOBILE_BREAKPOINT;
       setIsMobile(mobile);
-      
-      // Set sidebar closed by default on mobile
+
       if (mobile && isInitialMount.current) {
         setSidebarOpen(false);
       }
       isInitialMount.current = false;
-      
-      // Mark component as mounted after a tiny delay to prevent transition flash
+
       setTimeout(() => {
         setIsMounted(true);
       }, 50);
@@ -67,12 +65,10 @@ export default function Sidebar() {
         return mobile;
       });
 
-      // Close sidebar when switching to mobile
       if (!prevIsMobile.current && mobile) {
         setSidebarOpen(false);
       }
-      
-      // Open sidebar when switching to desktop
+
       if (prevIsMobile.current && !mobile && isInitialMount.current === false) {
         setSidebarOpen(true);
       }
@@ -145,41 +141,39 @@ export default function Sidebar() {
 
       <aside
         aria-label="Main navigation"
-        className={`fixed top-0 left-0 h-full z-20 flex flex-col select-none ${
+        className={`fixed top-0 left-0 z-20 flex flex-col select-none ${
           isMobile ? "shadow-2xl" : ""
         }`}
         style={{
           width: sidebarWidth,
+          height: "100vh",
+          minHeight: "-webkit-fill-available",
           background: "linear-gradient(180deg, #0c0c0f 0%, #09090b 100%)",
           borderRight: isHidden ? "none" : "1px solid rgba(255,255,255,0.06)",
-          // Only apply transition after component mounts to prevent initial flash
-          transition: isMounted ? "width 280ms cubic-bezier(0.4, 0, 0.2, 1)" : "none",
+          transition: isMounted
+            ? "width 280ms cubic-bezier(0.4, 0, 0.2, 1)"
+            : "none",
           overflowX: "hidden",
           visibility: isHidden ? "hidden" : "visible",
           pointerEvents: isHidden ? "none" : "auto",
-        }}
-      >
-        {/* Rest of your sidebar content remains the same */}
+        }}>
         {/* ── Logo row ─────────────────────────────────────── */}
         <div
           className="flex items-center h-14 px-3 shrink-0"
-          style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
-        >
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
           <button
             onClick={() => {
               navigate("/dashboard");
               if (isMobile) setSidebarOpen(false);
             }}
             aria-label="Go to dashboard"
-            className="flex items-center gap-3 min-w-0 flex-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded-xl"
-          >
+            className="flex items-center gap-3 min-w-0 flex-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded-xl">
             <div
               className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-transform active:scale-90"
               style={{
                 background: "linear-gradient(135deg,#4f46e5 0%,#6d28d9 100%)",
                 boxShadow: "0 0 20px rgba(79,70,229,0.35)",
-              }}
-            >
+              }}>
               <TrendingUp
                 size={14}
                 strokeWidth={2.5}
@@ -210,8 +204,7 @@ export default function Sidebar() {
                 const el = e.currentTarget as HTMLButtonElement;
                 el.style.background = "transparent";
                 el.style.color = "rgba(255,255,255,0.2)";
-              }}
-            >
+              }}>
               {sidebarOpen ? (
                 <ChevronLeft size={13} strokeWidth={2} aria-hidden="true" />
               ) : (
@@ -226,8 +219,7 @@ export default function Sidebar() {
           {sidebarOpen && (
             <p
               className="text-[9px] font-bold uppercase tracking-[0.12em] px-3 pt-3 pb-1.5"
-              style={{ color: "rgba(255,255,255,0.18)" }}
-            >
+              style={{ color: "rgba(255,255,255,0.18)" }}>
               Navigation
             </p>
           )}
@@ -241,8 +233,7 @@ export default function Sidebar() {
               style={{ outline: "none" }}
               onClick={() => {
                 if (isMobile) setSidebarOpen(false);
-              }}
-            >
+              }}>
               {({ isActive }) => (
                 <span
                   className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-150"
@@ -271,14 +262,12 @@ export default function Sidebar() {
                       (e.currentTarget as HTMLSpanElement).style.color =
                         "rgba(255,255,255,0.38)";
                     }
-                  }}
-                >
+                  }}>
                   {isActive && (
                     <span
                       className="absolute left-0 top-1/2 -translate-y-1/2 w-0.75 h-5 rounded-r-full"
                       style={{
-                        background:
-                          "linear-gradient(180deg,#818cf8,#6366f1)",
+                        background: "linear-gradient(180deg,#818cf8,#6366f1)",
                       }}
                       aria-hidden="true"
                     />
@@ -304,8 +293,7 @@ export default function Sidebar() {
                         transition: "opacity 150ms",
                       }}
                       role="tooltip"
-                      aria-hidden="true"
-                    >
+                      aria-hidden="true">
                       {label}
                       <span
                         className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent"
@@ -323,16 +311,14 @@ export default function Sidebar() {
         {/* Bottom section */}
         <div
           className="p-2 flex flex-col gap-0.5 shrink-0"
-          style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
-        >
+          style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
           <NavLink
             to="/settings"
             className="group relative"
             style={{ outline: "none" }}
             onClick={() => {
               if (isMobile) setSidebarOpen(false);
-            }}
-          >
+            }}>
             {({ isActive }) => (
               <span
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-150"
@@ -361,8 +347,7 @@ export default function Sidebar() {
                     (e.currentTarget as HTMLSpanElement).style.color =
                       "rgba(255,255,255,0.38)";
                   }
-                }}
-              >
+                }}>
                 {isActive && (
                   <span
                     className="absolute left-0 top-1/2 -translate-y-1/2 w-0.75 h-5 rounded-r-full"
@@ -391,8 +376,7 @@ export default function Sidebar() {
                       transition: "opacity 150ms",
                     }}
                     role="tooltip"
-                    aria-hidden="true"
-                  >
+                    aria-hidden="true">
                     Settings
                     <span
                       className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent"
@@ -414,8 +398,7 @@ export default function Sidebar() {
               style={{
                 background: "rgba(255,255,255,0.03)",
                 border: "1px solid rgba(255,255,255,0.06)",
-              }}
-            >
+              }}>
               {user?.avatar ? (
                 <img
                   src={user.avatar}
@@ -431,8 +414,7 @@ export default function Sidebar() {
                       "linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%)",
                     color: "#fff",
                     boxShadow: "0 0 12px rgba(79,70,229,0.25)",
-                  }}
-                >
+                  }}>
                   {initials}
                 </div>
               )}
@@ -444,8 +426,7 @@ export default function Sidebar() {
                     </p>
                     <p
                       className="text-[10px] truncate leading-none"
-                      style={{ color: "rgba(255,255,255,0.3)" }}
-                    >
+                      style={{ color: "rgba(255,255,255,0.3)" }}>
                       {user?.email}
                     </p>
                   </div>
@@ -464,8 +445,7 @@ export default function Sidebar() {
                       const el = e.currentTarget as HTMLButtonElement;
                       el.style.background = "transparent";
                       el.style.color = "rgba(255,255,255,0.25)";
-                    }}
-                  >
+                    }}>
                     <LogOut size={13} strokeWidth={1.5} aria-hidden="true" />
                   </button>
                 </>
