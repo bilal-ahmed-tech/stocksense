@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { TrendingUp, Eye, EyeOff, ArrowRight, Check } from "lucide-react";
+import { TrendingUp, Eye, EyeOff, ArrowRight, ArrowLeft, Check } from "lucide-react";
 import { useRegister } from "@/hooks/useRegister";
 import axios from "axios";
 
@@ -81,9 +81,23 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex" style={{ background: "#09090b" }}>
+    <div className="min-h-screen flex relative" style={{ background: "#09090b" }}>
       {/* Left panel */}
       <title>Get Started — StockSense</title>
+      <Link
+        to="/"
+        className="absolute top-6 left-6 z-10 flex items-center gap-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded-lg"
+        style={{ color: "rgba(255,255,255,0.4)" }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLAnchorElement).style.color = "#fff";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.4)";
+        }}
+      >
+        <ArrowLeft size={15} strokeWidth={1.5} aria-hidden="true" />
+        Back to home
+      </Link>
       <div
         className="hidden lg:flex flex-col justify-between p-10 w-105 shrink-0"
         style={{
