@@ -11,7 +11,9 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
+    {},
+  );
   const [serverError, setServerError] = useState("");
 
   function validate() {
@@ -36,52 +38,40 @@ export default function Login() {
         onError: (err) => {
           setServerError(
             axios.isAxiosError(err)
-              ? (err.response?.data as { error: string })?.error ??
-                  "Invalid email or password"
-              : "Something went wrong"
+              ? ((err.response?.data as { error: string })?.error ??
+                  "Invalid email or password")
+              : "Something went wrong",
           );
         },
-      }
+      },
     );
   }
 
   return (
     <div
       className="min-h-screen flex relative"
-      style={{ background: "#09090b" }}
-    >
+      style={{ background: "#09090b" }}>
       <title>Sign In — StockSense</title>
-      <Link
-        to="/"
-        className="absolute top-6 left-6 z-10 flex items-center gap-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded-lg"
-        style={{ color: "rgba(255,255,255,0.4)" }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLAnchorElement).style.color = "#fff";
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.4)";
-        }}
-      >
-        <ArrowLeft size={15} strokeWidth={1.5} aria-hidden="true" />
-        Back to home
-      </Link>
       {/* Left panel — branding */}
       <div
         className="hidden lg:flex flex-col justify-between p-10 w-105 shrink-0"
         style={{
           background: "#0c0c0f",
           borderRight: "1px solid rgba(255,255,255,0.06)",
-        }}
-      >
+        }}>
         <div className="flex items-center gap-2">
           <div
             className="w-8 h-8 rounded-xl flex items-center justify-center"
             style={{
               background: "linear-gradient(135deg,#4f46e5,#6d28d9)",
               boxShadow: "0 0 20px rgba(79,70,229,0.3)",
-            }}
-          >
-            <TrendingUp size={15} strokeWidth={2.5} className="text-white" aria-hidden="true" />
+            }}>
+            <TrendingUp
+              size={15}
+              strokeWidth={2.5}
+              className="text-white"
+              aria-hidden="true"
+            />
           </div>
           <span className="font-bold text-[15px] text-white tracking-tight">
             StockSense
@@ -91,15 +81,21 @@ export default function Login() {
         <div className="space-y-6">
           <div
             className="w-12 h-12 rounded-2xl flex items-center justify-center"
-            style={{ background: "rgba(99,102,241,0.12)" }}
-          >
-            <TrendingUp size={22} strokeWidth={1.5} style={{ color: "#818cf8" }} aria-hidden="true" />
+            style={{ background: "rgba(99,102,241,0.12)" }}>
+            <TrendingUp
+              size={22}
+              strokeWidth={1.5}
+              style={{ color: "#818cf8" }}
+              aria-hidden="true"
+            />
           </div>
           <div>
             <h2 className="text-2xl font-bold text-white tracking-tight mb-3">
               Master the market without the risk
             </h2>
-            <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.4)" }}>
+            <p
+              className="text-sm leading-relaxed"
+              style={{ color: "rgba(255,255,255,0.4)" }}>
               Trade with $100,000 in virtual funds. Real prices, real charts,
               real experience — zero risk.
             </p>
@@ -119,10 +115,11 @@ export default function Login() {
                 style={{
                   background: "rgba(255,255,255,0.03)",
                   border: "1px solid rgba(255,255,255,0.06)",
-                }}
-              >
+                }}>
                 <p className="text-xs font-bold text-white">{value}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+                <p
+                  className="text-[10px] mt-0.5"
+                  style={{ color: "rgba(255,255,255,0.3)" }}>
                   {label}
                 </p>
               </div>
@@ -136,23 +133,42 @@ export default function Login() {
       </div>
 
       {/* Right panel — form */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12">
+      <div className="flex-1 flex items-center justify-center px-6 py-10">
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="flex items-center gap-2 mb-8 lg:hidden">
             <div
               className="w-7 h-7 rounded-lg flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg,#4f46e5,#6d28d9)" }}
-            >
-              <TrendingUp size={13} strokeWidth={2.5} className="text-white" aria-hidden="true" />
+              style={{ background: "linear-gradient(135deg,#4f46e5,#6d28d9)" }}>
+              <TrendingUp
+                size={13}
+                strokeWidth={2.5}
+                className="text-white"
+                aria-hidden="true"
+              />
             </div>
             <span className="font-bold text-sm text-white">StockSense</span>
           </div>
-
+          <Link
+            to="/"
+            className="flex mb-6 items-center gap-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded-lg"
+            style={{ color: "rgba(255,255,255,0.4)" }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.color = "#fff";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.color =
+                "rgba(255,255,255,0.4)";
+            }}>
+            <ArrowLeft size={15} strokeWidth={1.5} aria-hidden="true" />
+            Back to home
+          </Link>
           <h1 className="text-2xl font-bold text-white tracking-tight mb-1">
             Welcome back
           </h1>
-          <p className="text-sm mb-8" style={{ color: "rgba(255,255,255,0.4)" }}>
+          <p
+            className="text-sm mb-8"
+            style={{ color: "rgba(255,255,255,0.4)" }}>
             Sign in to your account to continue
           </p>
 
@@ -165,8 +181,7 @@ export default function Login() {
                 border: "1px solid rgba(239,68,68,0.2)",
                 color: "#f87171",
               }}
-              role="alert"
-            >
+              role="alert">
               <span aria-hidden="true">⚠</span>
               {serverError}
             </div>
@@ -178,8 +193,7 @@ export default function Login() {
               <label
                 htmlFor="email"
                 className="text-xs font-semibold"
-                style={{ color: "rgba(255,255,255,0.5)" }}
-              >
+                style={{ color: "rgba(255,255,255,0.5)" }}>
                 Email address
               </label>
               <input
@@ -188,7 +202,8 @@ export default function Login() {
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
+                  if (errors.email)
+                    setErrors((p) => ({ ...p, email: undefined }));
                 }}
                 autoComplete="email"
                 placeholder="you@example.com"
@@ -203,12 +218,14 @@ export default function Login() {
                 }}
                 onFocus={(e) => {
                   if (!errors.email)
-                    e.currentTarget.style.border = "1px solid rgba(99,102,241,0.5)";
+                    e.currentTarget.style.border =
+                      "1px solid rgba(99,102,241,0.5)";
                   e.currentTarget.style.background = "rgba(255,255,255,0.07)";
                 }}
                 onBlur={(e) => {
                   if (!errors.email)
-                    e.currentTarget.style.border = "1px solid rgba(255,255,255,0.08)";
+                    e.currentTarget.style.border =
+                      "1px solid rgba(255,255,255,0.08)";
                   e.currentTarget.style.background = "rgba(255,255,255,0.05)";
                 }}
               />
@@ -217,8 +234,7 @@ export default function Login() {
                   id="email-error"
                   role="alert"
                   className="text-xs"
-                  style={{ color: "#f87171" }}
-                >
+                  style={{ color: "#f87171" }}>
                   {errors.email}
                 </p>
               )}
@@ -229,8 +245,7 @@ export default function Login() {
               <label
                 htmlFor="password"
                 className="text-xs font-semibold"
-                style={{ color: "rgba(255,255,255,0.5)" }}
-              >
+                style={{ color: "rgba(255,255,255,0.5)" }}>
                 Password
               </label>
               <div className="relative">
@@ -246,7 +261,9 @@ export default function Login() {
                   autoComplete="current-password"
                   placeholder="••••••••"
                   aria-invalid={!!errors.password}
-                  aria-describedby={errors.password ? "password-error" : undefined}
+                  aria-describedby={
+                    errors.password ? "password-error" : undefined
+                  }
                   className="w-full px-4 py-3 pr-11 rounded-xl text-sm text-white placeholder:text-white/20 focus:outline-none transition-all"
                   style={{
                     background: "rgba(255,255,255,0.05)",
@@ -256,12 +273,14 @@ export default function Login() {
                   }}
                   onFocus={(e) => {
                     if (!errors.password)
-                      e.currentTarget.style.border = "1px solid rgba(99,102,241,0.5)";
+                      e.currentTarget.style.border =
+                        "1px solid rgba(99,102,241,0.5)";
                     e.currentTarget.style.background = "rgba(255,255,255,0.07)";
                   }}
                   onBlur={(e) => {
                     if (!errors.password)
-                      e.currentTarget.style.border = "1px solid rgba(255,255,255,0.08)";
+                      e.currentTarget.style.border =
+                        "1px solid rgba(255,255,255,0.08)";
                     e.currentTarget.style.background = "rgba(255,255,255,0.05)";
                   }}
                 />
@@ -269,12 +288,12 @@ export default function Login() {
                   type="button"
                   onClick={() => setShowPassword((p) => !p)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute text-gray-200 right-3 top-1/2 -translate-y-1/2 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-500 rounded"
-                >
-                  {showPassword
-                    ? <EyeOff size={15} strokeWidth={1.5} aria-hidden="true" />
-                    : <Eye size={15} strokeWidth={1.5} aria-hidden="true" />
-                  }
+                  className="absolute text-gray-200 right-3 top-1/2 -translate-y-1/2 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-500 rounded">
+                  {showPassword ? (
+                    <EyeOff size={15} strokeWidth={1.5} aria-hidden="true" />
+                  ) : (
+                    <Eye size={15} strokeWidth={1.5} aria-hidden="true" />
+                  )}
                 </button>
               </div>
               {errors.password && (
@@ -282,8 +301,7 @@ export default function Login() {
                   id="password-error"
                   role="alert"
                   className="text-xs"
-                  style={{ color: "#f87171" }}
-                >
+                  style={{ color: "#f87171" }}>
                   {errors.password}
                 </p>
               )}
@@ -294,13 +312,15 @@ export default function Login() {
               type="submit"
               disabled={isPending}
               className="w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold text-white rounded-xl transition-all active:scale-95 disabled:active:scale-100 disabled:opacity-60 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 mt-2"
-              style={{ background: "#4f46e5" }}
-            >
+              style={{ background: "#4f46e5" }}>
               {isPending ? (
                 <>
                   <div
                     className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin"
-                    style={{ borderColor: "rgba(255,255,255,0.4)", borderTopColor: "transparent" }}
+                    style={{
+                      borderColor: "rgba(255,255,255,0.4)",
+                      borderTopColor: "transparent",
+                    }}
                   />
                   Signing in...
                 </>
@@ -313,7 +333,9 @@ export default function Login() {
             </button>
           </form>
 
-          <p className="text-sm text-center mt-6" style={{ color: "rgba(255,255,255,0.35)" }}>
+          <p
+            className="text-sm text-center mt-6"
+            style={{ color: "rgba(255,255,255,0.35)" }}>
             No account?{" "}
             <Link
               to="/register"
@@ -324,8 +346,7 @@ export default function Login() {
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLAnchorElement).style.color = "#818cf8";
-              }}
-            >
+              }}>
               Create one for free
             </Link>
           </p>
