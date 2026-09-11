@@ -27,6 +27,18 @@ function processQueue(err: unknown, token: string | null) {
   pendingQueue = [];
 }
 
+function isAuthRequest(url?: string) {
+  if (!url) return false;
+
+  return [
+    "/auth/login",
+    "/auth/register",
+    "/auth/google",
+    "/auth/refresh",
+    "/auth/logout",
+  ].some((endpoint) => url.includes(endpoint));
+}
+
 api.interceptors.response.use(
   (response) => response,
   async (error: unknown) => {
@@ -35,6 +47,11 @@ api.interceptors.response.use(
     const originalRequest = error.config as typeof error.config & {
       _retry?: boolean;
     };
+    const requestUrl = originalRequest?.url ?? "";
+
+    if (isAuthRequest(requestUrl)) {
+      return Promise.reject(error);
+    }
 
     if (error.response?.status !== 401 || originalRequest?._retry) {
       return Promise.reject(error);
@@ -58,7 +75,7 @@ api.interceptors.response.use(
       const { data } = await axios.post<{ data: { accessToken: string } }>(
         `${import.meta.env.VITE_API_URL as string}/auth/refresh`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       const newToken = data.data.accessToken;
       store.dispatch(updateAccessToken(newToken));
@@ -75,5 +92,5 @@ api.interceptors.response.use(
     } finally {
       isRefreshing = false;
     }
-  }
+  },
 );

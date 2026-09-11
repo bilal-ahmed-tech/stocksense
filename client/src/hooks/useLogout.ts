@@ -17,7 +17,7 @@ export function useLogout() {
       dispatch(clearCredentials());
       queryClient.clear();
       disconnectSocket();
-      navigate("/login");
+      navigate("/login", { replace: true });
     },
   });
 }

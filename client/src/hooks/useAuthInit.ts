@@ -16,6 +16,16 @@ export function useAuthInit() {
       return;
     }
 
+    const hasRefreshCookie = document.cookie
+      .split(";")
+      .some((cookie) => cookie.trim().startsWith("refreshToken="));
+
+    if (!hasRefreshCookie) {
+      dispatch(clearCredentials());
+      setIsLoading(false);
+      return;
+    }
+
     api
       .post<{ data: { accessToken: string } }>("/auth/refresh")
       .then((r) => {
@@ -29,7 +39,7 @@ export function useAuthInit() {
               setCredentials({
                 user: userRes.data.data.user,
                 accessToken,
-              })
+              }),
             );
           });
       })

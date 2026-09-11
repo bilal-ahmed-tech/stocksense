@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { TrendingUp, Eye, EyeOff, ArrowRight, ArrowLeft } from "lucide-react";
 import { useLogin } from "@/hooks/useLogin";
@@ -16,6 +16,14 @@ export default function Login() {
     {},
   );
   const [serverError, setServerError] = useState("");
+
+  useEffect(() => {
+    setEmail("");
+    setPassword("");
+    setShowPassword(false);
+    setErrors({});
+    setServerError("");
+  }, []);
 
   function validate() {
     const e: typeof errors = {};
@@ -205,6 +213,7 @@ export default function Login() {
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
                 value={email}
                 onChange={(e) => {
@@ -212,7 +221,9 @@ export default function Login() {
                   if (errors.email)
                     setErrors((p) => ({ ...p, email: undefined }));
                 }}
-                autoComplete="email"
+                autoComplete="username"
+                inputMode="email"
+                spellCheck={false}
                 placeholder="you@example.com"
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? "email-error" : undefined}
@@ -258,6 +269,7 @@ export default function Login() {
               <div className="relative">
                 <input
                   id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => {
@@ -266,6 +278,7 @@ export default function Login() {
                       setErrors((p) => ({ ...p, password: undefined }));
                   }}
                   autoComplete="current-password"
+                  spellCheck={false}
                   placeholder="••••••••"
                   aria-invalid={!!errors.password}
                   aria-describedby={
