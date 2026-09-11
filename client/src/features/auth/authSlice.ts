@@ -6,6 +6,8 @@ interface User {
   email: string;
   avatar: string | null;
   virtualBalance: number;
+  emailVerified: boolean;
+  authProvider: "local" | "google";
 }
 
 interface AuthState {

@@ -215,15 +215,33 @@ export default function Settings() {
               Email
             </span>
             <div
-              className="px-4 py-2.5 rounded-xl text-sm font-mono"
+              className="px-4 py-2.5 rounded-xl text-sm font-mono flex items-center justify-between gap-3"
               style={{
                 background: "rgba(255,255,255,0.03)",
                 border: "1px solid rgba(255,255,255,0.06)",
                 color: "rgba(255,255,255,0.4)",
               }}
             >
-              {user?.email}
+              <span className="truncate">{user?.email}</span>
+              <span
+                className="shrink-0 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md"
+                style={{
+                  background:
+                    user?.emailVerified !== false
+                      ? "rgba(16,185,129,0.15)"
+                      : "rgba(245,158,11,0.15)",
+                  color:
+                    user?.emailVerified !== false ? "#34d399" : "#fbbf24",
+                }}
+              >
+                {user?.emailVerified !== false ? "Verified" : "Unverified"}
+              </span>
             </div>
+            {user?.authProvider === "google" && (
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+                Signed in with Google
+              </p>
+            )}
           </div>
 
           {/* Virtual balance (read only) */}
@@ -248,106 +266,130 @@ export default function Settings() {
         </div>
       </section>
 
-      {/* Password card */}
-      <section
-        aria-label="Change password"
-        className="rounded-2xl overflow-hidden"
-        style={{
-          background: "#0e0e10",
-          border: "1px solid rgba(255,255,255,0.07)",
-        }}
-      >
-        <div
-          className="px-5 py-4 flex items-center gap-2"
-          style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+      {/* Password card — hidden for Google-only accounts */}
+      {user?.authProvider !== "google" ? (
+        <section
+          aria-label="Change password"
+          className="rounded-2xl overflow-hidden"
+          style={{
+            background: "#0e0e10",
+            border: "1px solid rgba(255,255,255,0.07)",
+          }}
         >
           <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center"
-            style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}
+            className="px-5 py-4 flex items-center gap-2"
+            style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
           >
-            <Lock size={14} strokeWidth={1.5} aria-hidden="true" />
-          </div>
-          <h2 className="text-sm font-semibold text-white">Change Password</h2>
-        </div>
-
-        <div className="p-5 space-y-3">
-          {[
-            {
-              id: "current-password",
-              label: "Current Password",
-              value: currentPassword,
-              onChange: setCurrentPassword,
-              autoComplete: "current-password",
-            },
-            {
-              id: "new-password",
-              label: "New Password",
-              value: newPassword,
-              onChange: setNewPassword,
-              autoComplete: "new-password",
-            },
-            {
-              id: "confirm-password",
-              label: "Confirm New Password",
-              value: confirmPassword,
-              onChange: setConfirmPassword,
-              autoComplete: "new-password",
-            },
-          ].map(({ id, label, value, onChange, autoComplete }) => (
-            <div key={id} className="flex flex-col gap-1.5">
-              <label
-                htmlFor={id}
-                className="text-xs font-medium"
-                style={{ color: "rgba(255,255,255,0.4)" }}
-              >
-                {label}
-              </label>
-              <input
-                id={id}
-                type="password"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                autoComplete={autoComplete}
-                className="px-4 py-2.5 rounded-xl text-sm text-white focus:outline-none transition-all"
-                style={{
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.border =
-                    "1px solid rgba(99,102,241,0.5)";
-                  e.currentTarget.style.background = "rgba(255,255,255,0.07)";
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.border =
-                    "1px solid rgba(255,255,255,0.08)";
-                  e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-                }}
-              />
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center"
+              style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}
+            >
+              <Lock size={14} strokeWidth={1.5} aria-hidden="true" />
             </div>
-          ))}
+            <h2 className="text-sm font-semibold text-white">Change Password</h2>
+          </div>
 
-          {passwordError && (
-            <p role="alert" className="text-xs" style={{ color: "#f87171" }}>
-              {passwordError}
-            </p>
-          )}
-          {passwordSuccess && (
-            <p className="text-xs" style={{ color: "#10b981" }}>
-              Password changed successfully
-            </p>
-          )}
+          <div className="p-5 space-y-3">
+            {[
+              {
+                id: "current-password",
+                label: "Current Password",
+                value: currentPassword,
+                onChange: setCurrentPassword,
+                autoComplete: "current-password",
+              },
+              {
+                id: "new-password",
+                label: "New Password",
+                value: newPassword,
+                onChange: setNewPassword,
+                autoComplete: "new-password",
+              },
+              {
+                id: "confirm-password",
+                label: "Confirm New Password",
+                value: confirmPassword,
+                onChange: setConfirmPassword,
+                autoComplete: "new-password",
+              },
+            ].map(({ id, label, value, onChange, autoComplete }) => (
+              <div key={id} className="flex flex-col gap-1.5">
+                <label
+                  htmlFor={id}
+                  className="text-xs font-medium"
+                  style={{ color: "rgba(255,255,255,0.4)" }}
+                >
+                  {label}
+                </label>
+                <input
+                  id={id}
+                  type="password"
+                  value={value}
+                  onChange={(e) => onChange(e.target.value)}
+                  autoComplete={autoComplete}
+                  className="px-4 py-2.5 rounded-xl text-sm text-white focus:outline-none transition-all"
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.border =
+                      "1px solid rgba(99,102,241,0.5)";
+                    e.currentTarget.style.background = "rgba(255,255,255,0.07)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.border =
+                      "1px solid rgba(255,255,255,0.08)";
+                    e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+                  }}
+                />
+              </div>
+            ))}
 
-          <button
-            onClick={handlePasswordChange}
-            disabled={passwordLoading}
-            className="mt-1 px-5 py-2.5 cursor-pointer text-sm font-semibold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40 disabled:active:scale-100 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-            style={{ background: "#4f46e5" }}
-          >
-            {passwordLoading ? "Changing..." : "Change Password"}
-          </button>
-        </div>
-      </section>
+            {passwordError && (
+              <p role="alert" className="text-xs" style={{ color: "#f87171" }}>
+                {passwordError}
+              </p>
+            )}
+            {passwordSuccess && (
+              <p className="text-xs" style={{ color: "#10b981" }}>
+                Password changed successfully
+              </p>
+            )}
+
+            <button
+              onClick={handlePasswordChange}
+              disabled={passwordLoading}
+              className="mt-1 px-5 py-2.5 cursor-pointer text-sm font-semibold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40 disabled:active:scale-100 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+              style={{ background: "#4f46e5" }}
+            >
+              {passwordLoading ? "Changing..." : "Change Password"}
+            </button>
+          </div>
+        </section>
+      ) : (
+        <section
+          aria-label="Sign-in method"
+          className="rounded-2xl p-5"
+          style={{
+            background: "#0e0e10",
+            border: "1px solid rgba(255,255,255,0.07)",
+          }}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center"
+              style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}
+            >
+              <Lock size={14} strokeWidth={1.5} aria-hidden="true" />
+            </div>
+            <h2 className="text-sm font-semibold text-white">Password</h2>
+          </div>
+          <p className="text-sm" style={{ color: "rgba(255,255,255,0.45)" }}>
+            You signed in with Google, so password changes are managed through your Google account.
+          </p>
+        </section>
+      )}
 
       {/* Security info */}
       <section

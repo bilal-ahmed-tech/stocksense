@@ -5,6 +5,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import Landing from "@/pages/Landing";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import VerifyEmail from "@/pages/VerifyEmail";
 import Dashboard from "@/pages/Dashboard";
 import Portfolio from "@/pages/Portfolio";
 import Watchlist from "@/pages/Watchlist";
@@ -33,6 +34,10 @@ export const router = createBrowserRouter([
         <Register />
       </GuestRoute>
     ),
+  },
+  {
+    path: "/verify-email",
+    element: <VerifyEmail />,
   },
   {
     path: "/",

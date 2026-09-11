@@ -3,6 +3,7 @@ import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 import TradeModal from "@/components/portfolio/TradeModal";
+import EmailVerificationBanner from "@/components/auth/EmailVerificationBanner";
 import { useUIStore } from "@/stores/useUIStore";
 import { useSocket } from "@/hooks/useSocket";
 import { useQueryClient } from "@tanstack/react-query";
@@ -60,6 +61,7 @@ export default function AppLayout() {
       >
         <main className="flex-1 p-2 sm:p-6">
           <ScrollToTop />
+          <EmailVerificationBanner />
           <Outlet />
         </main>
         <Footer />

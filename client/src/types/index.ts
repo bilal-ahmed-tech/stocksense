@@ -1,9 +1,13 @@
+export type AuthProvider = "local" | "google";
+
 export interface User {
   _id: string;
   name: string;
   email: string;
   avatar: string | null;
   virtualBalance: number;
+  emailVerified: boolean;
+  authProvider: AuthProvider;
   createdAt: string;
 }
 

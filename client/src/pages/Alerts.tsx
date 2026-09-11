@@ -64,6 +64,14 @@ export default function Alerts() {
           setTargetPrice("");
           setCondition("ABOVE");
         },
+        onError: (err) => {
+          const message =
+            err && typeof err === "object" && "response" in err
+              ? ((err as { response?: { data?: { error?: string } } }).response
+                  ?.data?.error ?? "Failed to create alert")
+              : "Failed to create alert";
+          setFormError(message);
+        },
       }
     );
   }

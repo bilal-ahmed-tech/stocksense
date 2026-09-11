@@ -1,8 +1,8 @@
 import rateLimit from "express-rate-limit";
 
 export const authRateLimit = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10,                   // 10 requests per window per IP
+  windowMs: 15 * 60 * 1000,
+  max: 10,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (_req, res) => {
@@ -14,14 +14,27 @@ export const authRateLimit = rateLimit({
 });
 
 export const refreshRateLimit = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 20,                  // 20 requests per window per IP
+  windowMs: 5 * 60 * 1000,
+  max: 20,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (_req, res) => {
     res.status(429).json({
       success: false,
       error: "Too many requests. Please try again shortly.",
+    });
+  },
+});
+
+export const resendVerificationRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => {
+    res.status(429).json({
+      success: false,
+      error: "Too many verification emails sent. Please try again later.",
     });
   },
 });

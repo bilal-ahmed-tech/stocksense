@@ -58,13 +58,17 @@ A full-stack real-time stock portfolio tracker and simulator built with React 19
 - Update display name
 - Avatar upload with in-browser crop and zoom via react-easy-crop
 - Cloudinary storage — auto WebP, fast CDN delivery
-- Change password with current password verification
+- Change password with current password verification (hidden for Google-only accounts)
+- Email verification status badge
 - Reset virtual balance to $100,000
 - Delete account with all associated data
 
 ### 👤 Authentication
-- Register with bcrypt password hashing
+- Register with bcrypt password hashing + verification email
 - Login with JWT access token (15min) + refresh token (7d httpOnly cookie)
+- Google Sign-In via ID token verified with `google-auth-library`
+- Email verification link (24h expiry) + resend (3 / 15 min)
+- Creating price alerts requires a verified email
 - Auto token refresh on 401 via axios interceptor — transparent to user
 - Page refresh auth restoration via `useAuthInit` — no flash of logged-out state
 - Logout clears cookie + Redux state + React Query cache + socket disconnect
@@ -131,7 +135,8 @@ A full-stack real-time stock portfolio tracker and simulator built with React 19
 - **JWT** — access token (15min) in memory + refresh token (7d) in httpOnly cookie
 - **Socket.io** — real-time price updates and alert triggers
 - **bcryptjs** — password hashing
-- **Nodemailer** — price alert emails
+- **Nodemailer** — price alert + email verification emails
+- **Google Auth Library** — verify Google ID tokens server-side
 - **Zod** — server-side request validation
 - **express-rate-limit** — brute force protection on auth endpoints
 - **Cloudinary + Multer** — avatar upload, crop, delete
@@ -189,6 +194,7 @@ CLOUDINARY_API_KEY=your_cloudinary_key
 CLOUDINARY_API_SECRET=your_cloudinary_secret
 NODEMAILER_USER=your_email@gmail.com
 NODEMAILER_PASS=your_app_password
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
 CLIENT_URL=http://localhost:5173
 ```
 
@@ -196,6 +202,7 @@ CLIENT_URL=http://localhost:5173
 ```env
 VITE_API_URL=http://localhost:5000/api
 VITE_SOCKET_URL=http://localhost:5000
+VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id
 ```
 
 ### Running Locally
@@ -223,6 +230,9 @@ npm run dev
 |--------|------|-------------|
 | POST | /register | Yes (10 / 15 min) |
 | POST | /login | Yes (10 / 15 min) |
+| POST | /google | Yes (10 / 15 min) |
+| POST | /verify-email | No |
+| POST | /resend-verification | Yes (3 / 15 min) |
 | POST | /refresh | Yes (20 / 5 min) |
 | POST | /logout | No |
 | GET | /me | No |
@@ -282,8 +292,11 @@ Zustand         → anything that only affects UI (sidebar, modals, filters)
 
 ### Auth Flow
 ```
-Register  → bcrypt hash → create user → access token + refresh token cookie
+Register  → bcrypt hash → create user (unverified) → send verification email → JWT session
 Login     → verify password → access token (15min) + refresh token (7d httpOnly cookie)
+Google    → client sends ID token → verify with Google → find/create/link user → JWT session
+Verify    → POST /auth/verify-email with token → mark emailVerified=true
+Resend    → POST /auth/resend-verification (auth required, rate limited)
 Request   → axios attaches Bearer token from Redux
 401       → axios interceptor calls /auth/refresh automatically → retry original request
 Refresh   → server reads httpOnly cookie → issues new access token

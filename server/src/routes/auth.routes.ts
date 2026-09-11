@@ -2,6 +2,9 @@ import { Router } from "express";
 import {
   register,
   login,
+  googleAuth,
+  verifyEmailHandler,
+  resendVerification,
   refresh,
   logout,
   getMe,
@@ -11,12 +14,19 @@ import {
   deleteMe,
 } from "../controllers/auth.controller";
 import { requireAuth } from "../middleware/auth.middleware";
-import { authRateLimit, refreshRateLimit } from "../middleware/rateLimit";
+import {
+  authRateLimit,
+  refreshRateLimit,
+  resendVerificationRateLimit,
+} from "../middleware/rateLimit";
 
 const router = Router();
 
 router.post("/register", authRateLimit, register);
 router.post("/login", authRateLimit, login);
+router.post("/google", authRateLimit, googleAuth);
+router.post("/verify-email", verifyEmailHandler);
+router.post("/resend-verification", resendVerificationRateLimit, requireAuth, resendVerification);
 router.post("/refresh", refreshRateLimit, refresh);
 router.post("/logout", logout);
 router.get("/me", requireAuth, getMe);

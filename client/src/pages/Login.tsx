@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { TrendingUp, Eye, EyeOff, ArrowRight, ArrowLeft } from "lucide-react";
 import { useLogin } from "@/hooks/useLogin";
+import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
 import axios from "axios";
 
 export default function Login() {
@@ -186,6 +187,12 @@ export default function Login() {
               {serverError}
             </div>
           )}
+
+          <GoogleAuthButton
+            onSuccess={() => navigate("/dashboard")}
+            onError={setServerError}
+            disabled={isPending}
+          />
 
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
             {/* Email */}

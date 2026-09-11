@@ -3,6 +3,9 @@ import { z } from "zod";
 import {
   registerUser,
   loginUser,
+  loginWithGoogle,
+  verifyEmail,
+  resendVerificationEmail,
   refreshAccessToken,
   logoutUser,
   sanitizeUser,
@@ -13,10 +16,11 @@ import { Transaction } from "../models/Transaction";
 import { Watchlist } from "../models/Watchlist";
 import type { AuthRequest } from "../middleware/auth.middleware";
 import { Alert } from "../models/Alert";
+
 const REFRESH_COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: process.env.NODE_ENV === "production" ? "none" as const : "strict" as const,
+  sameSite: process.env.NODE_ENV === "production" ? ("none" as const) : ("strict" as const),
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
@@ -29,6 +33,14 @@ const registerSchema = z.object({
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
+});
+
+const googleSchema = z.object({
+  idToken: z.string().min(1),
+});
+
+const verifyEmailSchema = z.object({
+  token: z.string().min(1),
 });
 
 export async function register(
@@ -88,6 +100,65 @@ export async function login(
   }
 }
 
+export async function googleAuth(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const body = googleSchema.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({
+        success: false,
+        error: "Invalid Google sign-in payload",
+      });
+      return;
+    }
+
+    const { user, accessToken, refreshToken } = await loginWithGoogle(
+      body.data.idToken,
+    );
+
+    res.cookie("refreshToken", refreshToken, REFRESH_COOKIE_OPTIONS);
+    res.status(200).json({ success: true, data: { user, accessToken } });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function verifyEmailHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const body = verifyEmailSchema.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ success: false, error: "Verification token required" });
+      return;
+    }
+
+    const user = await verifyEmail(body.data.token);
+    res.status(200).json({ success: true, data: { user } });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function resendVerification(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const { userId } = req as AuthRequest;
+    await resendVerificationEmail(userId);
+    res.status(200).json({ success: true, data: null });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function refresh(
   req: Request,
   res: Response,
@@ -130,7 +201,7 @@ export async function getMe(
 ): Promise<void> {
   try {
     const userId = (req as Request & { userId?: string }).userId;
-    const user = await User.findById(userId).select("-password -refreshToken");
+    const user = await User.findById(userId);
     if (!user) {
       res.status(404).json({ success: false, error: "User not found" });
       return;
@@ -140,6 +211,7 @@ export async function getMe(
     next(err);
   }
 }
+
 export async function updateMe(
   req: Request,
   res: Response,
@@ -152,8 +224,12 @@ export async function updateMe(
       userId,
       { name },
       { new: true },
-    ).select("-password -refreshToken");
-    res.json({ success: true, data: { name: user?.name } });
+    );
+    if (!user) {
+      res.status(404).json({ success: false, error: "User not found" });
+      return;
+    }
+    res.json({ success: true, data: { name: user.name } });
   } catch (err) {
     next(err);
   }
@@ -170,9 +246,16 @@ export async function changePassword(
       currentPassword: string;
       newPassword: string;
     };
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select("+password");
     if (!user) {
       res.status(404).json({ success: false, error: "User not found" });
+      return;
+    }
+    if (!user.password) {
+      res.status(400).json({
+        success: false,
+        error: "Password login is not enabled for this account",
+      });
       return;
     }
     const valid = await user.comparePassword(currentPassword);

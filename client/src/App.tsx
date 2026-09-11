@@ -1,4 +1,5 @@
 import { RouterProvider } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "sonner";
 import { router } from "@/router";
 import { useAuthInit } from "@/hooks/useAuthInit";
@@ -33,5 +34,15 @@ function AppContent() {
 }
 
 export default function App() {
-  return <AppContent />;
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string;
+
+  if (!googleClientId) {
+    console.warn("VITE_GOOGLE_CLIENT_ID is not set — Google sign-in disabled");
+  }
+
+  return (
+    <GoogleOAuthProvider clientId={googleClientId || "placeholder-client-id"}>
+      <AppContent />
+    </GoogleOAuthProvider>
+  );
 }

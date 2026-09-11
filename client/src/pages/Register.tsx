@@ -9,6 +9,8 @@ import {
   Check,
 } from "lucide-react";
 import { useRegister } from "@/hooks/useRegister";
+import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
+import { toast } from "sonner";
 import axios from "axios";
 
 function getPasswordStrength(password: string): {
@@ -75,7 +77,10 @@ export default function Register() {
     register(
       { name, email, password },
       {
-        onSuccess: () => navigate("/dashboard"),
+        onSuccess: () => {
+          toast.success("Account created. Check your email to verify your address.");
+          navigate("/dashboard");
+        },
         onError: (err) => {
           setServerError(
             axios.isAxiosError(err)
@@ -230,6 +235,12 @@ export default function Register() {
               {serverError}
             </div>
           )}
+
+          <GoogleAuthButton
+            onSuccess={() => navigate("/dashboard")}
+            onError={setServerError}
+            disabled={isPending}
+          />
 
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
             {/* Name */}
