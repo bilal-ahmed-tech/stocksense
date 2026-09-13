@@ -77,7 +77,7 @@ export default function Settings() {
       setTimeout(() => setPasswordSuccess(false), 3000);
     } catch (err) {
       setPasswordError(
-        err instanceof Error ? err.message : "Failed to change password"
+        err instanceof Error ? err.message : "Failed to change password",
       );
     } finally {
       setPasswordLoading(false);
@@ -123,7 +123,7 @@ export default function Settings() {
         <h1 className="text-2xl font-bold text-white tracking-tight">
           Settings
         </h1>
-        <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
+        <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
           Manage your account preferences
         </p>
       </header>
@@ -135,16 +135,13 @@ export default function Settings() {
         style={{
           background: "#0e0e10",
           border: "1px solid rgba(255,255,255,0.07)",
-        }}
-      >
+        }}>
         <div
           className="px-5 py-4 flex items-center gap-2"
-          style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-        >
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
           <div
             className="w-7 h-7 rounded-lg flex items-center justify-center"
-            style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}
-          >
+            style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}>
             <User size={14} strokeWidth={1.5} aria-hidden="true" />
           </div>
           <h2 className="text-sm font-semibold text-white">Profile</h2>
@@ -159,8 +156,7 @@ export default function Settings() {
             <label
               htmlFor="settings-name"
               className="text-xs font-medium"
-              style={{ color: "rgba(255,255,255,0.4)" }}
-            >
+              style={{ color: "var(--text-secondary)" }}>
               Display Name
             </label>
             <div className="flex gap-2">
@@ -189,8 +185,7 @@ export default function Settings() {
                 onClick={handleNameUpdate}
                 disabled={nameLoading || name.trim() === user?.name}
                 className="px-4 py-2.5 text-sm font-semibold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40 disabled:active:scale-100 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                style={{ background: "#4f46e5" }}
-              >
+                style={{ background: "#4f46e5" }}>
                 {nameLoading ? "Saving..." : "Save"}
               </button>
             </div>
@@ -210,8 +205,7 @@ export default function Settings() {
           <div className="flex flex-col gap-1.5">
             <span
               className="text-xs font-medium"
-              style={{ color: "rgba(255,255,255,0.4)" }}
-            >
+              style={{ color: "rgba(255,255,255,0.4)" }}>
               Email
             </span>
             <div
@@ -220,8 +214,7 @@ export default function Settings() {
                 background: "rgba(255,255,255,0.03)",
                 border: "1px solid rgba(255,255,255,0.06)",
                 color: "rgba(255,255,255,0.4)",
-              }}
-            >
+              }}>
               <span className="truncate">{user?.email}</span>
               <span
                 className="shrink-0 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md"
@@ -230,15 +223,15 @@ export default function Settings() {
                     user?.emailVerified !== false
                       ? "rgba(16,185,129,0.15)"
                       : "rgba(245,158,11,0.15)",
-                  color:
-                    user?.emailVerified !== false ? "#34d399" : "#fbbf24",
-                }}
-              >
+                  color: user?.emailVerified !== false ? "#34d399" : "#fbbf24",
+                }}>
                 {user?.emailVerified !== false ? "Verified" : "Unverified"}
               </span>
             </div>
             {user?.authProvider === "google" && (
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+              <p
+                className="text-xs"
+                style={{ color: "rgba(255,255,255,0.35)" }}>
                 Signed in with Google
               </p>
             )}
@@ -248,8 +241,7 @@ export default function Settings() {
           <div className="flex flex-col gap-1.5">
             <span
               className="text-xs font-medium"
-              style={{ color: "rgba(255,255,255,0.4)" }}
-            >
+              style={{ color: "rgba(255,255,255,0.4)" }}>
               Virtual Balance
             </span>
             <div
@@ -258,8 +250,7 @@ export default function Settings() {
                 background: "rgba(255,255,255,0.03)",
                 border: "1px solid rgba(255,255,255,0.06)",
                 color: "#a5b4fc",
-              }}
-            >
+              }}>
               {formatUSD(user?.virtualBalance ?? 0)}
             </div>
           </div>
@@ -274,19 +265,18 @@ export default function Settings() {
           style={{
             background: "#0e0e10",
             border: "1px solid rgba(255,255,255,0.07)",
-          }}
-        >
+          }}>
           <div
             className="px-5 py-4 flex items-center gap-2"
-            style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-          >
+            style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
             <div
               className="w-7 h-7 rounded-lg flex items-center justify-center"
-              style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}
-            >
+              style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}>
               <Lock size={14} strokeWidth={1.5} aria-hidden="true" />
             </div>
-            <h2 className="text-sm font-semibold text-white">Change Password</h2>
+            <h2 className="text-sm font-semibold text-white">
+              Change Password
+            </h2>
           </div>
 
           <div className="p-5 space-y-3">
@@ -317,8 +307,7 @@ export default function Settings() {
                 <label
                   htmlFor={id}
                   className="text-xs font-medium"
-                  style={{ color: "rgba(255,255,255,0.4)" }}
-                >
+                  style={{ color: "rgba(255,255,255,0.4)" }}>
                   {label}
                 </label>
                 <input
@@ -361,8 +350,7 @@ export default function Settings() {
               onClick={handlePasswordChange}
               disabled={passwordLoading}
               className="mt-1 px-5 py-2.5 cursor-pointer text-sm font-semibold text-white rounded-xl transition-all active:scale-95 disabled:opacity-40 disabled:active:scale-100 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-              style={{ background: "#4f46e5" }}
-            >
+              style={{ background: "#4f46e5" }}>
               {passwordLoading ? "Changing..." : "Change Password"}
             </button>
           </div>
@@ -374,19 +362,18 @@ export default function Settings() {
           style={{
             background: "#0e0e10",
             border: "1px solid rgba(255,255,255,0.07)",
-          }}
-        >
+          }}>
           <div className="flex items-center gap-2 mb-2">
             <div
               className="w-7 h-7 rounded-lg flex items-center justify-center"
-              style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}
-            >
+              style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}>
               <Lock size={14} strokeWidth={1.5} aria-hidden="true" />
             </div>
             <h2 className="text-sm font-semibold text-white">Password</h2>
           </div>
           <p className="text-sm" style={{ color: "rgba(255,255,255,0.45)" }}>
-            You signed in with Google, so password changes are managed through your Google account.
+            You signed in with Google, so password changes are managed through
+            your Google account.
           </p>
         </section>
       )}
@@ -398,19 +385,19 @@ export default function Settings() {
         style={{
           background: "rgba(99,102,241,0.06)",
           border: "1px solid rgba(99,102,241,0.15)",
-        }}
-      >
+        }}>
         <div
           className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
-          style={{ background: "rgba(99,102,241,0.15)", color: "#818cf8" }}
-        >
+          style={{ background: "rgba(99,102,241,0.15)", color: "#818cf8" }}>
           <Shield size={14} strokeWidth={1.5} aria-hidden="true" />
         </div>
         <div>
           <p className="text-sm font-semibold text-white mb-1">
             Your session is secure
           </p>
-          <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.4)" }}>
+          <p
+            className="text-xs leading-relaxed"
+            style={{ color: "rgba(255,255,255,0.4)" }}>
             Access tokens expire every 15 minutes and are stored in memory only.
             Refresh tokens are stored in httpOnly cookies and cannot be accessed
             by JavaScript.
@@ -425,16 +412,13 @@ export default function Settings() {
         style={{
           background: "#0e0e10",
           border: "1px solid rgba(239,68,68,0.2)",
-        }}
-      >
+        }}>
         <div
           className="px-5 py-4 flex items-center gap-2"
-          style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-        >
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
           <div
             className="w-7 h-7 rounded-lg flex items-center justify-center"
-            style={{ background: "rgba(239,68,68,0.1)", color: "#f87171" }}
-          >
+            style={{ background: "rgba(239,68,68,0.1)", color: "#f87171" }}>
             <AlertTriangle size={14} strokeWidth={1.5} aria-hidden="true" />
           </div>
           <h2 className="text-sm font-semibold" style={{ color: "#f87171" }}>
@@ -446,16 +430,14 @@ export default function Settings() {
           {/* Reset balance */}
           <div
             className="flex items-center justify-between py-4"
-            style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
-          >
+            style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
             <div>
               <p className="text-sm font-semibold text-white">
                 Reset Virtual Balance
               </p>
               <p
                 className="text-xs mt-0.5"
-                style={{ color: "rgba(255,255,255,0.35)" }}
-              >
+                style={{ color: "rgba(255,255,255,0.35)" }}>
                 Resets to $100,000 and clears all holdings and transactions
               </p>
             </div>
@@ -477,8 +459,7 @@ export default function Settings() {
                 el.style.color = "rgba(255,255,255,0.5)";
                 el.style.border = "1px solid rgba(255,255,255,0.1)";
                 el.style.background = "transparent";
-              }}
-            >
+              }}>
               <RefreshCw size={12} strokeWidth={2} aria-hidden="true" />
               Reset
             </button>
@@ -490,8 +471,7 @@ export default function Settings() {
               <p className="text-sm font-semibold text-white">Delete Account</p>
               <p
                 className="text-xs mt-0.5"
-                style={{ color: "rgba(255,255,255,0.35)" }}
-              >
+                style={{ color: "rgba(255,255,255,0.35)" }}>
                 Permanently delete your account and all associated data
               </p>
             </div>
@@ -510,8 +490,7 @@ export default function Settings() {
               onMouseLeave={(e) => {
                 const el = e.currentTarget as HTMLButtonElement;
                 el.style.background = "rgba(239,68,68,0.06)";
-              }}
-            >
+              }}>
               <Trash2 size={12} strokeWidth={2} aria-hidden="true" />
               Delete
             </button>
@@ -565,8 +544,7 @@ function AvatarUpload() {
         <button
           onClick={() => setShowModal(true)}
           aria-label="Update avatar"
-          className="relative group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded-full"
-        >
+          className="relative group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded-full">
           <div
             className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden transition-all"
             style={{
@@ -579,8 +557,7 @@ function AvatarUpload() {
             onMouseLeave={(e) => {
               (e.currentTarget as HTMLDivElement).style.border =
                 "2px solid rgba(255,255,255,0.08)";
-            }}
-          >
+            }}>
             {user?.avatar ? (
               <img
                 src={user.avatar}
@@ -591,19 +568,16 @@ function AvatarUpload() {
               <div
                 className="w-full h-full flex items-center justify-center text-lg font-bold"
                 style={{
-                  background:
-                    "linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%)",
+                  background: "linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%)",
                   color: "#fff",
-                }}
-              >
+                }}>
                 {initials}
               </div>
             )}
           </div>
           <div
             className="absolute inset-0 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-            style={{ background: "rgba(0,0,0,0.5)" }}
-          >
+            style={{ background: "rgba(0,0,0,0.5)" }}>
             <Upload
               size={16}
               strokeWidth={1.5}
@@ -615,7 +589,9 @@ function AvatarUpload() {
 
         <div>
           <p className="text-sm font-semibold text-white">{user?.name}</p>
-          <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>
+          <p
+            className="text-xs mt-0.5"
+            style={{ color: "rgba(255,255,255,0.35)" }}>
             {user?.email}
           </p>
           <button
@@ -627,16 +603,13 @@ function AvatarUpload() {
             }}
             onMouseLeave={(e) => {
               (e.currentTarget as HTMLButtonElement).style.color = "#818cf8";
-            }}
-          >
+            }}>
             Change photo
           </button>
         </div>
       </div>
 
-      {showModal && (
-        <AvatarUploadModal onClose={() => setShowModal(false)} />
-      )}
+      {showModal && <AvatarUploadModal onClose={() => setShowModal(false)} />}
     </>
   );
 }
@@ -670,26 +643,25 @@ function ConfirmModal({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      >
+        className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div
           className="w-full max-w-sm rounded-2xl p-6 space-y-4"
           style={{
             background: "#18181b",
             border: "1px solid rgba(255,255,255,0.1)",
             boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
-          }}
-        >
+          }}>
           <div className="flex items-center gap-3">
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-              style={{ background: "rgba(239,68,68,0.1)", color: "#f87171" }}
-            >
+              style={{ background: "rgba(239,68,68,0.1)", color: "#f87171" }}>
               <AlertTriangle size={18} strokeWidth={1.5} aria-hidden="true" />
             </div>
             <h2 className="text-base font-bold text-white">{title}</h2>
           </div>
-          <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
+          <p
+            className="text-sm leading-relaxed"
+            style={{ color: "rgba(255,255,255,0.5)" }}>
             {message}
           </p>
           <div className="flex gap-3 pt-1">
@@ -708,16 +680,14 @@ function ConfirmModal({
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLButtonElement).style.background =
                   "transparent";
-              }}
-            >
+              }}>
               Cancel
             </button>
             <button
               onClick={onConfirm}
               disabled={loading}
               className="flex-1 py-2.5 text-sm font-semibold text-white rounded-xl transition-all active:scale-95 disabled:active:scale-100 disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 hover:opacity-90"
-              style={{ background: "#dc2626" }}
-            >
+              style={{ background: "#dc2626" }}>
               {loading ? "Processing..." : confirmLabel}
             </button>
           </div>

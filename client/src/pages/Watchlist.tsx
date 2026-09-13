@@ -44,7 +44,8 @@ export default function Watchlist() {
     isError: watchlistError,
     refetch: refetchWatchlist,
   } = useWatchlist();
-  const { data: searchResults, isLoading: searching } = useStockSearch(debouncedQuery);
+  const { data: searchResults, isLoading: searching } =
+    useStockSearch(debouncedQuery);
   const { mutate: addSymbol, isPending: adding } = useAddToWatchlist();
   const { mutate: removeSymbol } = useRemoveFromWatchlist();
 
@@ -67,7 +68,9 @@ export default function Watchlist() {
           <h1 className="text-2xl font-bold text-white tracking-tight">
             Watchlist
           </h1>
-          <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
+          <p
+            className="text-sm mt-1"
+            style={{ color: "var(--text-secondary)" }}>
             {watchlist?.symbols.length
               ? `Tracking ${watchlist.symbols.length} stock${watchlist.symbols.length !== 1 ? "s" : ""}`
               : "Track stocks you are interested in"}
@@ -97,8 +100,7 @@ export default function Watchlist() {
                 (e.currentTarget as HTMLDivElement).style.background =
                   "rgba(255,255,255,0.04)";
               }
-            }}
-          >
+            }}>
             <Search
               size={15}
               strokeWidth={1.5}
@@ -137,8 +139,7 @@ export default function Watchlist() {
                 }}
                 aria-label="Clear search"
                 className="shrink-0 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-500 rounded"
-                style={{ color: "rgba(255,255,255,0.3)" }}
-              >
+                style={{ color: "rgba(255,255,255,0.3)" }}>
                 <X size={18} strokeWidth={1.5} aria-hidden="true" />
               </button>
             )}
@@ -154,10 +155,10 @@ export default function Watchlist() {
                 background: "#18181b",
                 border: "1px solid rgba(255,255,255,0.08)",
                 boxShadow: "0 16px 48px rgba(0,0,0,0.6)",
-              }}
-            >
+              }}>
               {searchResults.slice(0, 6).map((result: StockSearchResult) => {
-                const isWatched = watchlist?.symbols?.includes(result.symbol) ?? false;
+                const isWatched =
+                  watchlist?.symbols?.includes(result.symbol) ?? false;
                 return (
                   <SearchResultItem
                     key={result.symbol}
@@ -183,9 +184,10 @@ export default function Watchlist() {
                   background: "#18181b",
                   border: "1px solid rgba(255,255,255,0.08)",
                   boxShadow: "0 16px 48px rgba(0,0,0,0.6)",
-                }}
-              >
-                <p className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>
+                }}>
+                <p
+                  className="text-sm"
+                  style={{ color: "rgba(255,255,255,0.3)" }}>
                   No results for "{debouncedQuery}"
                 </p>
               </div>
@@ -210,16 +212,14 @@ export default function Watchlist() {
             style={{
               background: "#0e0e10",
               border: "1px solid rgba(255,255,255,0.07)",
-            }}
-          >
+            }}>
             {/* Table header */}
             <div
               className="grid items-center px-5 py-3.5"
               style={{
                 gridTemplateColumns: "1fr 120px 130px 40px",
                 borderBottom: "1px solid rgba(255,255,255,0.06)",
-              }}
-            >
+              }}>
               {[
                 { label: "Stock", align: "left" },
                 { label: "Price", align: "right" },
@@ -232,8 +232,7 @@ export default function Watchlist() {
                   style={{
                     color: "rgba(255,255,255,0.3)",
                     textAlign: align as "left" | "right",
-                  }}
-                >
+                  }}>
                   {label}
                 </span>
               ))}
@@ -284,28 +283,23 @@ function SearchResultItem({
       onClick={() => !isWatched && onAdd()}
       disabled={adding || isWatched}
       className="w-full flex items-center gap-3 px-4 py-3 text-left transition-all focus-visible:outline-none disabled:cursor-default hover:bg-white/5"
-      style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
-    >
+      style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
       {/* Symbol icon */}
       <div
         className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0"
         style={{
           background: "rgba(99,102,241,0.12)",
           color: "#818cf8",
-        }}
-      >
+        }}>
         {symbol.slice(0, 2)}
       </div>
 
       {/* Stock info */}
       <div className="flex-1 min-w-0">
-        <p className="font-mono text-sm font-semibold text-white">
-          {symbol}
-        </p>
+        <p className="font-mono text-sm font-semibold text-white">{symbol}</p>
         <p
           className="text-xs truncate"
-          style={{ color: "rgba(255,255,255,0.35)" }}
-        >
+          style={{ color: "rgba(255,255,255,0.35)" }}>
           {name}
         </p>
       </div>
@@ -324,14 +318,21 @@ function SearchResultItem({
             </p>
             <div className="flex items-center gap-1 justify-end">
               {isPositive ? (
-                <TrendingUp size={10} strokeWidth={2} style={{ color: "#10b981" }} />
+                <TrendingUp
+                  size={10}
+                  strokeWidth={2}
+                  style={{ color: "#10b981" }}
+                />
               ) : (
-                <TrendingDown size={10} strokeWidth={2} style={{ color: "#ef4444" }} />
+                <TrendingDown
+                  size={10}
+                  strokeWidth={2}
+                  style={{ color: "#ef4444" }}
+                />
               )}
               <span
                 className="text-xs font-mono"
-                style={{ color: isPositive ? "#10b981" : "#ef4444" }}
-              >
+                style={{ color: isPositive ? "#10b981" : "#ef4444" }}>
                 {formatPercent(quote.changePercent)}
               </span>
             </div>
@@ -348,8 +349,7 @@ function SearchResultItem({
         {isWatched ? (
           <span
             className="text-xs font-semibold inline-flex items-center gap-1"
-            style={{ color: "#818cf8" }}
-          >
+            style={{ color: "#818cf8" }}>
             <Check size={12} strokeWidth={2} />
             Watching
           </span>
@@ -359,8 +359,7 @@ function SearchResultItem({
             style={{
               background: "rgba(99,102,241,0.12)",
               color: "#818cf8",
-            }}
-          >
+            }}>
             {adding ? (
               <div
                 className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin"
@@ -403,26 +402,22 @@ function WatchlistItem({
       style={{
         gridTemplateColumns: "1fr 120px 130px 40px",
         borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.04)",
-      }}
-    >
+      }}>
       {/* Stock info */}
       <button
         onClick={onClick}
         aria-label={`View ${symbol} details`}
-        className="flex items-center gap-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded-xl"
-      >
+        className="flex items-center gap-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 rounded-xl">
         <div
           className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-transform group-hover:scale-105"
-          style={{ background: "rgba(99,102,241,0.1)", color: "#818cf8" }}
-        >
+          style={{ background: "rgba(99,102,241,0.1)", color: "#818cf8" }}>
           {symbol.slice(0, 2)}
         </div>
         <div>
           <p className="font-mono text-sm font-semibold text-white">{symbol}</p>
           <p
             className="text-xs truncate max-w-40"
-            style={{ color: "rgba(255,255,255,0.3)" }}
-          >
+            style={{ color: "rgba(255,255,255,0.3)" }}>
             {quote?.name ?? "—"}
           </p>
         </div>
@@ -453,8 +448,7 @@ function WatchlistItem({
           <div>
             <p
               className="font-mono text-sm font-semibold flex items-center justify-end gap-1"
-              style={{ color: isPositive ? "#10b981" : "#ef4444" }}
-            >
+              style={{ color: isPositive ? "#10b981" : "#ef4444" }}>
               {isPositive ? (
                 <TrendingUp size={12} strokeWidth={2} aria-hidden="true" />
               ) : (
@@ -467,8 +461,7 @@ function WatchlistItem({
               style={{
                 color: isPositive ? "#10b981" : "#ef4444",
                 opacity: 0.65,
-              }}
-            >
+              }}>
               {isPositive ? "+" : ""}
               {formatUSD(quote.change)}
             </p>
@@ -500,8 +493,7 @@ function WatchlistItem({
             el.style.background = "transparent";
             el.style.color = "rgba(255,255,255,0.3)";
             el.style.border = "1px solid rgba(255,255,255,0.08)";
-          }}
-        >
+          }}>
           <Trash2 size={13} strokeWidth={1.5} aria-hidden="true" />
         </button>
       </div>
@@ -518,8 +510,7 @@ function WatchlistSkeleton() {
       style={{
         background: "#0e0e10",
         border: "1px solid rgba(255,255,255,0.07)",
-      }}
-    >
+      }}>
       {[1, 2, 3, 4].map((i) => (
         <div
           key={i}
@@ -540,12 +531,10 @@ function EmptyWatchlist() {
       style={{
         background: "#0e0e10",
         border: "1px solid rgba(255,255,255,0.07)",
-      }}
-    >
+      }}>
       <div
         className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto"
-        style={{ background: "rgba(99,102,241,0.1)" }}
-      >
+        style={{ background: "rgba(99,102,241,0.1)" }}>
         <LineChart
           size={26}
           strokeWidth={1.5}
@@ -578,8 +567,7 @@ function Check({ size = 16, strokeWidth = 2, className = "" }: IconProps) {
       strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={className}
-    >
+      className={className}>
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );

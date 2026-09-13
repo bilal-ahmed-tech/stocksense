@@ -55,12 +55,13 @@ export default function Portfolio() {
           <h1 className="text-2xl font-bold text-white tracking-tight">
             Portfolio
           </h1>
-          <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
+          <p
+            className="text-sm mt-1"
+            style={{ color: "var(--text-secondary)" }}>
             Virtual balance:{" "}
             <span
               className="font-mono font-semibold"
-              style={{ color: "#a5b4fc" }}
-            >
+              style={{ color: "#a5b4fc" }}>
               {formatUSD(user?.virtualBalance ?? 0)}
             </span>
           </p>
@@ -68,8 +69,7 @@ export default function Portfolio() {
         <button
           onClick={() => openModal("trade")}
           className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white rounded-xl transition-all active:scale-95 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 sm:w-auto w-full shrink-0"
-          style={{ background: "#4f46e5" }}
-        >
+          style={{ background: "#4f46e5" }}>
           <TrendingUp size={15} strokeWidth={2} aria-hidden="true" />
           New Trade
         </button>
@@ -83,8 +83,7 @@ export default function Portfolio() {
         style={{
           background: "rgba(255,255,255,0.04)",
           border: "1px solid rgba(255,255,255,0.07)",
-        }}
-      >
+        }}>
         {(
           [
             { id: "holdings", label: "Holdings", icon: BriefcaseBusiness },
@@ -101,19 +100,18 @@ export default function Portfolio() {
             style={
               activeTab === id
                 ? { background: "#4f46e5", color: "#fff" }
-                : { color: "rgba(255,255,255,0.4)" }
+                : { color: "var(--text-secondary)" }
             }
             onMouseEnter={(e) => {
               if (activeTab !== id)
                 (e.currentTarget as HTMLButtonElement).style.color =
-                  "rgba(255,255,255,0.7)";
+                  "var(--text-primary)";
             }}
             onMouseLeave={(e) => {
               if (activeTab !== id)
                 (e.currentTarget as HTMLButtonElement).style.color =
-                  "rgba(255,255,255,0.4)";
-            }}
-          >
+                  "var(--text-secondary)";
+            }}>
             <Icon size={14} strokeWidth={1.5} aria-hidden="true" />
             {label}
           </button>
@@ -151,14 +149,14 @@ export default function Portfolio() {
                               border: "1px solid rgba(99,102,241,0.25)",
                             }
                       : {
-                          color: "rgba(255,255,255,0.35)",
+                          color: "var(--text-muted)",
                           border: "1px solid rgba(255,255,255,0.08)",
                         }
                   }
                   onMouseEnter={(e) => {
                     if (filter !== f) {
                       (e.currentTarget as HTMLButtonElement).style.color =
-                        "rgba(255,255,255,0.65)";
+                        "var(--text-primary)";
                       (e.currentTarget as HTMLButtonElement).style.border =
                         "1px solid rgba(255,255,255,0.15)";
                     }
@@ -166,12 +164,11 @@ export default function Portfolio() {
                   onMouseLeave={(e) => {
                     if (filter !== f) {
                       (e.currentTarget as HTMLButtonElement).style.color =
-                        "rgba(255,255,255,0.35)";
+                        "var(--text-muted)";
                       (e.currentTarget as HTMLButtonElement).style.border =
                         "1px solid rgba(255,255,255,0.08)";
                     }
-                  }}
-                >
+                  }}>
                   {f === "all" ? "All" : f === "gain" ? "Gainers" : "Losers"}
                 </button>
               ))}
@@ -206,8 +203,7 @@ export default function Portfolio() {
         <section
           id="transactions-panel"
           role="tabpanel"
-          aria-label="Transaction history"
-        >
+          aria-label="Transaction history">
           {txLoading && !txError ? (
             <TransactionsSkeleton />
           ) : txError ? (
@@ -221,8 +217,7 @@ export default function Portfolio() {
               style={{
                 background: "#0e0e10",
                 border: "1px solid rgba(255,255,255,0.07)",
-              }}
-            >
+              }}>
               <p className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>
                 No transactions yet
               </p>
@@ -235,15 +230,16 @@ export default function Portfolio() {
                 border: "1px solid rgba(255,255,255,0.07)",
                 overflowX: "auto",
                 scrollbarWidth: "none",
-              }}
-            >
+              }}>
               {/* Desktop table — visible at sm+ */}
               <table
                 className="hidden sm:table w-full text-sm"
-                style={{ minWidth: 560 }}
-              >
+                style={{ minWidth: 560 }}>
                 <thead>
-                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                  <tr
+                    style={{
+                      borderBottom: "1px solid rgba(255,255,255,0.06)",
+                    }}>
                     {["Type", "Symbol", "Shares", "Price", "Total", "Date"].map(
                       (h, i) => (
                         <th
@@ -253,11 +249,10 @@ export default function Portfolio() {
                           style={{
                             color: "rgba(255,255,255,0.3)",
                             textAlign: i >= 2 ? "right" : "left",
-                          }}
-                        >
+                          }}>
                           {h}
                         </th>
-                      )
+                      ),
                     )}
                   </tr>
                 </thead>
@@ -266,29 +261,45 @@ export default function Portfolio() {
                     <tr
                       key={tx._id}
                       className="transition-all"
-                      style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}
+                      style={{
+                        borderBottom: "1px solid rgba(255,255,255,0.04)",
+                      }}
                       onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLTableRowElement).style.background =
-                          "rgba(255,255,255,0.025)";
+                        (
+                          e.currentTarget as HTMLTableRowElement
+                        ).style.background = "rgba(255,255,255,0.025)";
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLTableRowElement).style.background =
-                          "transparent";
-                      }}
-                    >
+                        (
+                          e.currentTarget as HTMLTableRowElement
+                        ).style.background = "transparent";
+                      }}>
                       <td className="px-4 py-3.5">
                         <span
                           className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-lg"
                           style={
                             tx.type === "BUY"
-                              ? { background: "rgba(16,185,129,0.1)", color: "#10b981" }
-                              : { background: "rgba(239,68,68,0.1)", color: "#ef4444" }
-                          }
-                        >
+                              ? {
+                                  background: "rgba(16,185,129,0.1)",
+                                  color: "#10b981",
+                                }
+                              : {
+                                  background: "rgba(239,68,68,0.1)",
+                                  color: "#ef4444",
+                                }
+                          }>
                           {tx.type === "BUY" ? (
-                            <TrendingUp size={10} strokeWidth={2} aria-hidden="true" />
+                            <TrendingUp
+                              size={10}
+                              strokeWidth={2}
+                              aria-hidden="true"
+                            />
                           ) : (
-                            <TrendingDown size={10} strokeWidth={2} aria-hidden="true" />
+                            <TrendingDown
+                              size={10}
+                              strokeWidth={2}
+                              aria-hidden="true"
+                            />
                           )}
                           {tx.type}
                         </span>
@@ -300,14 +311,12 @@ export default function Portfolio() {
                       </td>
                       <td
                         className="px-4 py-3.5 text-right font-mono text-sm"
-                        style={{ color: "rgba(255,255,255,0.6)" }}
-                      >
+                        style={{ color: "rgba(255,255,255,0.6)" }}>
                         {tx.shares}
                       </td>
                       <td
                         className="px-4 py-3.5 text-right font-mono text-sm"
-                        style={{ color: "rgba(255,255,255,0.6)" }}
-                      >
+                        style={{ color: "rgba(255,255,255,0.6)" }}>
                         {formatUSD(tx.priceAtTime)}
                       </td>
                       <td className="px-4 py-3.5 text-right font-mono text-sm font-semibold text-white">
@@ -317,8 +326,7 @@ export default function Portfolio() {
                         <time
                           dateTime={tx.createdAt}
                           className="text-xs"
-                          style={{ color: "rgba(255,255,255,0.35)" }}
-                        >
+                          style={{ color: "rgba(255,255,255,0.35)" }}>
                           {format(parseISO(tx.createdAt), "MMM d, yyyy")}
                         </time>
                       </td>
@@ -330,8 +338,7 @@ export default function Portfolio() {
               {/* Mobile cards — hidden at sm+ */}
               <div
                 className="sm:hidden divide-y"
-                style={{ borderColor: "rgba(255,255,255,0.06)" }}
-              >
+                style={{ borderColor: "rgba(255,255,255,0.06)" }}>
                 {transactions.map((tx) => (
                   <div key={tx._id} className="p-4 space-y-3">
                     <div className="flex items-center justify-between">
@@ -340,14 +347,27 @@ export default function Portfolio() {
                           className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-lg"
                           style={
                             tx.type === "BUY"
-                              ? { background: "rgba(16,185,129,0.1)", color: "#10b981" }
-                              : { background: "rgba(239,68,68,0.1)", color: "#ef4444" }
-                          }
-                        >
+                              ? {
+                                  background: "rgba(16,185,129,0.1)",
+                                  color: "#10b981",
+                                }
+                              : {
+                                  background: "rgba(239,68,68,0.1)",
+                                  color: "#ef4444",
+                                }
+                          }>
                           {tx.type === "BUY" ? (
-                            <TrendingUp size={10} strokeWidth={2} aria-hidden="true" />
+                            <TrendingUp
+                              size={10}
+                              strokeWidth={2}
+                              aria-hidden="true"
+                            />
                           ) : (
-                            <TrendingDown size={10} strokeWidth={2} aria-hidden="true" />
+                            <TrendingDown
+                              size={10}
+                              strokeWidth={2}
+                              aria-hidden="true"
+                            />
                           )}
                           {tx.type}
                         </span>
@@ -358,31 +378,40 @@ export default function Portfolio() {
                       <time
                         dateTime={tx.createdAt}
                         className="text-xs"
-                        style={{ color: "rgba(255,255,255,0.35)" }}
-                      >
+                        style={{ color: "rgba(255,255,255,0.35)" }}>
                         {format(parseISO(tx.createdAt), "MMM d, yyyy")}
                       </time>
                     </div>
                     {/* 2-col grid on mobile — Total spans full width */}
                     <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
                       <div>
-                        <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+                        <p
+                          className="text-xs mb-0.5"
+                          style={{ color: "rgba(255,255,255,0.3)" }}>
                           Shares
                         </p>
-                        <p className="font-mono text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
+                        <p
+                          className="font-mono text-sm"
+                          style={{ color: "rgba(255,255,255,0.6)" }}>
                           {tx.shares}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+                        <p
+                          className="text-xs mb-0.5"
+                          style={{ color: "rgba(255,255,255,0.3)" }}>
                           Price
                         </p>
-                        <p className="font-mono text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
+                        <p
+                          className="font-mono text-sm"
+                          style={{ color: "rgba(255,255,255,0.6)" }}>
                           {formatUSD(tx.priceAtTime)}
                         </p>
                       </div>
                       <div className="col-span-2">
-                        <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+                        <p
+                          className="text-xs mb-0.5"
+                          style={{ color: "rgba(255,255,255,0.3)" }}>
                           Total
                         </p>
                         <p className="font-mono text-sm font-semibold text-white">
@@ -499,8 +528,7 @@ function HoldingsTable({
         overflowX: "auto",
         overflowY: "hidden",
         scrollbarWidth: "none",
-      }}
-    >
+      }}>
       {sorted.length === 0 ? (
         <div className="p-12 text-center">
           <p className="text-sm" style={{ color: "rgba(255,255,255,0.25)" }}>
@@ -517,8 +545,7 @@ function HoldingsTable({
           */}
           <table
             className="hidden xl:table w-full text-sm"
-            style={{ minWidth: 640 }}
-          >
+            style={{ minWidth: 640 }}>
             <thead>
               <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                 {COLS.map(({ col, label, align }) => (
@@ -526,8 +553,7 @@ function HoldingsTable({
                     key={col}
                     scope="col"
                     className="px-4 py-3.5"
-                    style={{ textAlign: align }}
-                  >
+                    style={{ textAlign: align }}>
                     <button
                       onClick={() => onSort(col)}
                       className="inline-flex items-center gap-1.5 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-indigo-500 rounded"
@@ -537,17 +563,28 @@ function HoldingsTable({
                             ? "#a5b4fc"
                             : "rgba(255,255,255,0.3)",
                       }}
-                      aria-label={`Sort by ${label}`}
-                    >
+                      aria-label={`Sort by ${label}`}>
                       {label}
                       {sortColumn === col ? (
                         sortDirection === "asc" ? (
-                          <ArrowUp size={11} strokeWidth={2} aria-hidden="true" />
+                          <ArrowUp
+                            size={11}
+                            strokeWidth={2}
+                            aria-hidden="true"
+                          />
                         ) : (
-                          <ArrowDown size={11} strokeWidth={2} aria-hidden="true" />
+                          <ArrowDown
+                            size={11}
+                            strokeWidth={2}
+                            aria-hidden="true"
+                          />
                         )
                       ) : (
-                        <ArrowUpDown size={11} strokeWidth={1.5} aria-hidden="true" />
+                        <ArrowUpDown
+                          size={11}
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                        />
                       )}
                     </button>
                   </th>
@@ -555,8 +592,7 @@ function HoldingsTable({
                 <th
                   scope="col"
                   className="px-4 py-3.5 text-right text-xs font-semibold"
-                  style={{ color: "rgba(255,255,255,0.3)" }}
-                >
+                  style={{ color: "rgba(255,255,255,0.3)" }}>
                   Actions
                 </th>
               </tr>
@@ -582,8 +618,7 @@ function HoldingsTable({
           */}
           <div
             className="xl:hidden divide-y"
-            style={{ borderColor: "rgba(255,255,255,0.06)" }}
-          >
+            style={{ borderColor: "rgba(255,255,255,0.06)" }}>
             {sorted.map((holding) => (
               <HoldingCard
                 key={holding.symbol}
@@ -631,23 +666,23 @@ function HoldingRow({
           "rgba(255,255,255,0.025)";
       }}
       onMouseLeave={(e) => {
-        (e.currentTarget as HTMLTableRowElement).style.background = "transparent";
-      }}
-    >
+        (e.currentTarget as HTMLTableRowElement).style.background =
+          "transparent";
+      }}>
       <td className="px-4 py-4">
         <div className="flex items-center gap-3">
           <div
             className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-transform group-hover:scale-105"
-            style={{ background: "rgba(99,102,241,0.1)", color: "#818cf8" }}
-          >
+            style={{ background: "rgba(99,102,241,0.1)", color: "#818cf8" }}>
             {holding.symbol.slice(0, 2)}
           </div>
           <div className="min-w-0">
-            <p className="font-mono font-semibold text-white">{holding.symbol}</p>
+            <p className="font-mono font-semibold text-white">
+              {holding.symbol}
+            </p>
             <p
               className="text-xs truncate max-w-28"
-              style={{ color: "rgba(255,255,255,0.3)" }}
-            >
+              style={{ color: "rgba(255,255,255,0.3)" }}>
               {holding.name}
             </p>
           </div>
@@ -655,55 +690,59 @@ function HoldingRow({
       </td>
       <td
         className="px-4 py-4 text-right font-mono text-sm"
-        style={{ color: "rgba(255,255,255,0.6)" }}
-      >
+        style={{ color: "rgba(255,255,255,0.6)" }}>
         {holding.shares}
       </td>
       <td
         className="px-4 py-4 text-right font-mono text-sm"
-        style={{ color: "rgba(255,255,255,0.6)" }}
-      >
+        style={{ color: "rgba(255,255,255,0.6)" }}>
         {formatUSD(holding.avgBuyPrice)}
       </td>
       <td className="px-4 py-4 text-right font-mono text-sm font-semibold text-white">
-        {quote
-          ? formatUSD(currentPrice)
-          : quoteError
-            ? formatUSD(holding.avgBuyPrice)
-            : <Shimmer />}
+        {quote ? (
+          formatUSD(currentPrice)
+        ) : quoteError ? (
+          formatUSD(holding.avgBuyPrice)
+        ) : (
+          <Shimmer />
+        )}
       </td>
       <td className="px-4 py-4 text-right">
         {quote ? (
           <div>
             <p
               className="font-mono text-sm font-semibold flex items-center justify-end gap-1"
-              style={{ color: isPos ? "#10b981" : "#ef4444" }}
-            >
-              {isPos
-                ? <TrendingUp size={12} strokeWidth={2} aria-hidden="true" />
-                : <TrendingDown size={12} strokeWidth={2} aria-hidden="true" />}
+              style={{ color: isPos ? "#10b981" : "#ef4444" }}>
+              {isPos ? (
+                <TrendingUp size={12} strokeWidth={2} aria-hidden="true" />
+              ) : (
+                <TrendingDown size={12} strokeWidth={2} aria-hidden="true" />
+              )}
               {isPos ? "+" : ""}
               {formatUSD(pnl)}
             </p>
             <p
               className="font-mono text-xs"
-              style={{ color: isPos ? "#10b981" : "#ef4444", opacity: 0.75 }}
-            >
+              style={{ color: isPos ? "#10b981" : "#ef4444", opacity: 0.75 }}>
               {formatPercent(pnlPercent)}
             </p>
           </div>
         ) : quoteError ? (
-          <span className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>—</span>
+          <span className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
+            —
+          </span>
         ) : (
           <Shimmer />
         )}
       </td>
       <td className="px-4 py-4 text-right font-mono text-sm font-semibold text-white">
-        {quote
-          ? formatUSD(currentValue)
-          : quoteError
-            ? <span style={{ color: "rgba(255,255,255,0.25)" }}>—</span>
-            : <Shimmer />}
+        {quote ? (
+          formatUSD(currentValue)
+        ) : quoteError ? (
+          <span style={{ color: "rgba(255,255,255,0.25)" }}>—</span>
+        ) : (
+          <Shimmer />
+        )}
       </td>
       <td className="px-4 py-4">
         <div className="flex items-center justify-end gap-2">
@@ -726,8 +765,7 @@ function HoldingRow({
               el.style.background = "transparent";
               el.style.color = "rgba(255,255,255,0.3)";
               el.style.border = "1px solid rgba(255,255,255,0.08)";
-            }}
-          >
+            }}>
             <ExternalLink size={13} strokeWidth={1.5} aria-hidden="true" />
           </button>
           <button
@@ -750,8 +788,7 @@ function HoldingRow({
               el.style.background = "rgba(99,102,241,0.12)";
               el.style.color = "#a5b4fc";
               el.style.border = "1px solid rgba(99,102,241,0.2)";
-            }}
-          >
+            }}>
             Trade
           </button>
         </div>
@@ -788,16 +825,16 @@ function HoldingCard({
         <div className="flex items-center gap-3 min-w-0">
           <div
             className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0"
-            style={{ background: "rgba(99,102,241,0.1)", color: "#818cf8" }}
-          >
+            style={{ background: "rgba(99,102,241,0.1)", color: "#818cf8" }}>
             {holding.symbol.slice(0, 2)}
           </div>
           <div className="min-w-0">
-            <p className="font-mono font-semibold text-white">{holding.symbol}</p>
+            <p className="font-mono font-semibold text-white">
+              {holding.symbol}
+            </p>
             <p
               className="text-xs truncate"
-              style={{ color: "rgba(255,255,255,0.3)" }}
-            >
+              style={{ color: "rgba(255,255,255,0.3)" }}>
               {holding.name}
             </p>
           </div>
@@ -820,8 +857,7 @@ function HoldingCard({
               const el = e.currentTarget as HTMLButtonElement;
               el.style.background = "transparent";
               el.style.color = "rgba(255,255,255,0.3)";
-            }}
-          >
+            }}>
             <ExternalLink size={13} strokeWidth={1.5} aria-hidden="true" />
           </button>
           <button
@@ -844,8 +880,7 @@ function HoldingCard({
               el.style.background = "rgba(99,102,241,0.12)";
               el.style.color = "#a5b4fc";
               el.style.border = "1px solid rgba(99,102,241,0.2)";
-            }}
-          >
+            }}>
             Trade
           </button>
         </div>
@@ -854,70 +889,92 @@ function HoldingCard({
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 pt-1">
         <div>
-          <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+          <p
+            className="text-xs mb-0.5"
+            style={{ color: "rgba(255,255,255,0.3)" }}>
             Shares
           </p>
-          <p className="font-mono text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
+          <p
+            className="font-mono text-sm"
+            style={{ color: "rgba(255,255,255,0.6)" }}>
             {holding.shares}
           </p>
         </div>
         <div>
-          <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+          <p
+            className="text-xs mb-0.5"
+            style={{ color: "rgba(255,255,255,0.3)" }}>
             Avg Cost
           </p>
-          <p className="font-mono text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>
+          <p
+            className="font-mono text-sm"
+            style={{ color: "rgba(255,255,255,0.6)" }}>
             {formatUSD(holding.avgBuyPrice)}
           </p>
         </div>
         <div>
-          <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+          <p
+            className="text-xs mb-0.5"
+            style={{ color: "rgba(255,255,255,0.3)" }}>
             Current Price
           </p>
           <p className="font-mono text-sm font-semibold text-white">
-            {quote
-              ? formatUSD(currentPrice)
-              : quoteError
-                ? formatUSD(holding.avgBuyPrice)
-                : <Shimmer />}
+            {quote ? (
+              formatUSD(currentPrice)
+            ) : quoteError ? (
+              formatUSD(holding.avgBuyPrice)
+            ) : (
+              <Shimmer />
+            )}
           </p>
         </div>
         <div>
-          <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+          <p
+            className="text-xs mb-0.5"
+            style={{ color: "rgba(255,255,255,0.3)" }}>
             Value
           </p>
           <p className="font-mono text-sm font-semibold text-white">
-            {quote
-              ? formatUSD(currentValue)
-              : quoteError
-                ? <span style={{ color: "rgba(255,255,255,0.25)" }}>—</span>
-                : <Shimmer />}
+            {quote ? (
+              formatUSD(currentValue)
+            ) : quoteError ? (
+              <span style={{ color: "rgba(255,255,255,0.25)" }}>—</span>
+            ) : (
+              <Shimmer />
+            )}
           </p>
         </div>
         <div className="col-span-2">
-          <p className="text-xs mb-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
+          <p
+            className="text-xs mb-0.5"
+            style={{ color: "rgba(255,255,255,0.3)" }}>
             P&L
           </p>
           {quote ? (
             <div className="flex items-center gap-1.5">
               <p
                 className="font-mono text-sm font-semibold flex items-center gap-1"
-                style={{ color: isPos ? "#10b981" : "#ef4444" }}
-              >
-                {isPos
-                  ? <TrendingUp size={12} strokeWidth={2} aria-hidden="true" />
-                  : <TrendingDown size={12} strokeWidth={2} aria-hidden="true" />}
+                style={{ color: isPos ? "#10b981" : "#ef4444" }}>
+                {isPos ? (
+                  <TrendingUp size={12} strokeWidth={2} aria-hidden="true" />
+                ) : (
+                  <TrendingDown size={12} strokeWidth={2} aria-hidden="true" />
+                )}
                 {isPos ? "+" : ""}
                 {formatUSD(pnl)}
               </p>
               <p
                 className="font-mono text-xs"
-                style={{ color: isPos ? "#10b981" : "#ef4444", opacity: 0.75 }}
-              >
+                style={{ color: isPos ? "#10b981" : "#ef4444", opacity: 0.75 }}>
                 ({formatPercent(pnlPercent)})
               </p>
             </div>
           ) : quoteError ? (
-            <span className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>—</span>
+            <span
+              className="text-xs"
+              style={{ color: "rgba(255,255,255,0.25)" }}>
+              —
+            </span>
           ) : (
             <Shimmer />
           )}
@@ -944,8 +1001,10 @@ function HoldingsSkeleton() {
   return (
     <div
       className="rounded-2xl p-5 space-y-3"
-      style={{ background: "#0e0e10", border: "1px solid rgba(255,255,255,0.07)" }}
-    >
+      style={{
+        background: "#0e0e10",
+        border: "1px solid rgba(255,255,255,0.07)",
+      }}>
       {[1, 2, 3].map((i) => (
         <div
           key={i}
@@ -961,8 +1020,10 @@ function TransactionsSkeleton() {
   return (
     <div
       className="rounded-2xl p-5 space-y-3"
-      style={{ background: "#0e0e10", border: "1px solid rgba(255,255,255,0.07)" }}
-    >
+      style={{
+        background: "#0e0e10",
+        border: "1px solid rgba(255,255,255,0.07)",
+      }}>
       {[1, 2, 3].map((i) => (
         <div
           key={i}
@@ -980,12 +1041,13 @@ function EmptyHoldings({ onBuy }: { onBuy: () => void }) {
   return (
     <div
       className="rounded-2xl p-10 sm:p-16 text-center space-y-5"
-      style={{ background: "#0e0e10", border: "1px solid rgba(255,255,255,0.07)" }}
-    >
+      style={{
+        background: "#0e0e10",
+        border: "1px solid rgba(255,255,255,0.07)",
+      }}>
       <div
         className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto"
-        style={{ background: "rgba(99,102,241,0.1)" }}
-      >
+        style={{ background: "rgba(99,102,241,0.1)" }}>
         <BriefcaseBusiness
           size={26}
           strokeWidth={1.5}
@@ -994,7 +1056,9 @@ function EmptyHoldings({ onBuy }: { onBuy: () => void }) {
         />
       </div>
       <div>
-        <p className="text-base font-semibold text-white mb-1">No holdings yet</p>
+        <p className="text-base font-semibold text-white mb-1">
+          No holdings yet
+        </p>
         <p className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
           Search for a stock and make your first trade
         </p>
@@ -1002,8 +1066,7 @@ function EmptyHoldings({ onBuy }: { onBuy: () => void }) {
       <button
         onClick={onBuy}
         className="px-5 py-2.5 text-sm font-semibold text-white rounded-xl transition-all active:scale-95 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-        style={{ background: "#4f46e5" }}
-      >
+        style={{ background: "#4f46e5" }}>
         Start trading
       </button>
     </div>

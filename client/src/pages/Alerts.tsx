@@ -72,7 +72,7 @@ export default function Alerts() {
               : "Failed to create alert";
           setFormError(message);
         },
-      }
+      },
     );
   }
 
@@ -88,7 +88,7 @@ export default function Alerts() {
         <h1 className="text-2xl font-bold text-white tracking-tight">
           Price Alerts
         </h1>
-        <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
+        <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
           Get notified when a stock hits your target price
         </p>
       </header>
@@ -100,13 +100,11 @@ export default function Alerts() {
         style={{
           background: "#0e0e10",
           border: "1px solid rgba(255,255,255,0.07)",
-        }}
-      >
+        }}>
         <div className="flex items-center gap-2 mb-1">
           <div
             className="w-7 h-7 rounded-lg flex items-center justify-center"
-            style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}
-          >
+            style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}>
             <Plus size={14} strokeWidth={2} aria-hidden="true" />
           </div>
           <h2 className="text-sm font-semibold text-white">New Alert</h2>
@@ -118,8 +116,7 @@ export default function Alerts() {
             <label
               htmlFor="alert-symbol"
               className="text-xs font-medium"
-              style={{ color: "rgba(255,255,255,0.4)" }}
-            >
+              style={{ color: "var(--text-secondary)" }}>
               Symbol
             </label>
             <div className="relative">
@@ -143,8 +140,7 @@ export default function Alerts() {
                       "rgba(255,255,255,0.05)";
                     setTimeout(() => setShowResults(false), 200);
                   }
-                }}
-              >
+                }}>
                 <Search
                   size={13}
                   strokeWidth={1.5}
@@ -183,9 +179,13 @@ export default function Alerts() {
                     }}
                     aria-label="Clear symbol"
                     className="shrink-0 w-5 h-5 cursor-pointer flex items-center justify-center rounded-md focus-visible:outline-none transition-colors"
-                    style={{ color: "rgba(255,255,255,0.3)", marginRight: "2px" }}
+                    style={{
+                      color: "rgba(255,255,255,0.3)",
+                      marginRight: "2px",
+                    }}
                     onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLButtonElement).style.color = "#fff";
+                      (e.currentTarget as HTMLButtonElement).style.color =
+                        "#fff";
                       (e.currentTarget as HTMLButtonElement).style.background =
                         "rgba(255,255,255,0.08)";
                     }}
@@ -194,8 +194,7 @@ export default function Alerts() {
                         "rgba(255,255,255,0.3)";
                       (e.currentTarget as HTMLButtonElement).style.background =
                         "transparent";
-                    }}
-                  >
+                    }}>
                     <X size={14} strokeWidth={2} aria-hidden="true" />
                   </button>
                 )}
@@ -211,8 +210,7 @@ export default function Alerts() {
                     background: "#18181b",
                     border: "1px solid rgba(255,255,255,0.08)",
                     boxShadow: "0 16px 48px rgba(0,0,0,0.6)",
-                  }}
-                >
+                  }}>
                   {searchResults.slice(0, 5).map((result) => (
                     <button
                       key={result.symbol}
@@ -224,21 +222,21 @@ export default function Alerts() {
                         borderBottom: "1px solid rgba(255,255,255,0.05)",
                       }}
                       onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.background =
-                          "rgba(255,255,255,0.04)";
+                        (
+                          e.currentTarget as HTMLButtonElement
+                        ).style.background = "rgba(255,255,255,0.04)";
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.background =
-                          "transparent";
-                      }}
-                    >
+                        (
+                          e.currentTarget as HTMLButtonElement
+                        ).style.background = "transparent";
+                      }}>
                       <div
                         className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
                         style={{
                           background: "rgba(99,102,241,0.12)",
                           color: "#818cf8",
-                        }}
-                      >
+                        }}>
                         {result.symbol.slice(0, 2)}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -247,8 +245,7 @@ export default function Alerts() {
                         </p>
                         <p
                           className="text-[10px] truncate"
-                          style={{ color: "rgba(255,255,255,0.35)" }}
-                        >
+                          style={{ color: "rgba(255,255,255,0.35)" }}>
                           {result.name}
                         </p>
                       </div>
@@ -268,12 +265,10 @@ export default function Alerts() {
                       background: "#18181b",
                       border: "1px solid rgba(255,255,255,0.08)",
                       boxShadow: "0 16px 48px rgba(0,0,0,0.6)",
-                    }}
-                  >
+                    }}>
                     <p
                       className="text-xs"
-                      style={{ color: "rgba(255,255,255,0.3)" }}
-                    >
+                      style={{ color: "rgba(255,255,255,0.3)" }}>
                       No results for "{debouncedSymbol}"
                     </p>
                   </div>
@@ -285,8 +280,7 @@ export default function Alerts() {
           <div className="flex flex-col gap-1.5">
             <span
               className="text-xs font-medium"
-              style={{ color: "rgba(255,255,255,0.4)" }}
-            >
+              style={{ color: "rgba(255,255,255,0.4)" }}>
               Condition
             </span>
             <div
@@ -296,8 +290,7 @@ export default function Alerts() {
                 border: "1px solid rgba(255,255,255,0.08)",
               }}
               role="group"
-              aria-label="Alert condition"
-            >
+              aria-label="Alert condition">
               {(["ABOVE", "BELOW"] as AlertCondition[]).map((c) => (
                 <button
                   key={c}
@@ -316,12 +309,15 @@ export default function Alerts() {
                             color: "#ef4444",
                           }
                       : { color: "rgba(255,255,255,0.35)" }
-                  }
-                >
+                  }>
                   {c === "ABOVE" ? (
                     <TrendingUp size={12} strokeWidth={2} aria-hidden="true" />
                   ) : (
-                    <TrendingDown size={12} strokeWidth={2} aria-hidden="true" />
+                    <TrendingDown
+                      size={12}
+                      strokeWidth={2}
+                      aria-hidden="true"
+                    />
                   )}
                   {c}
                 </button>
@@ -334,8 +330,7 @@ export default function Alerts() {
             <label
               htmlFor="alert-price"
               className="text-xs font-medium"
-              style={{ color: "rgba(255,255,255,0.4)" }}
-            >
+              style={{ color: "rgba(255,255,255,0.4)" }}>
               Target Price
             </label>
             <input
@@ -350,8 +345,7 @@ export default function Alerts() {
                 border: "1px solid rgba(255,255,255,0.08)",
               }}
               onFocus={(e) => {
-                e.currentTarget.style.border =
-                  "1px solid rgba(99,102,241,0.5)";
+                e.currentTarget.style.border = "1px solid rgba(99,102,241,0.5)";
                 e.currentTarget.style.background = "rgba(255,255,255,0.07)";
               }}
               onBlur={(e) => {
@@ -373,8 +367,7 @@ export default function Alerts() {
           onClick={handleCreate}
           disabled={creating}
           className="px-5 py-2.5 cursor-pointer text-sm font-semibold text-white rounded-xl transition-all active:scale-95 hover:opacity-90 disabled:opacity-50 disabled:active:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-          style={{ background: "#4f46e5" }}
-        >
+          style={{ background: "#4f46e5" }}>
           {creating ? "Creating..." : "Create Alert"}
         </button>
       </section>
@@ -384,13 +377,11 @@ export default function Alerts() {
         <div className="flex items-center justify-between mb-3">
           <h2
             className="text-sm font-semibold"
-            style={{ color: "rgba(255,255,255,0.5)" }}
-          >
+            style={{ color: "rgba(255,255,255,0.5)" }}>
             Active
             <span
               className="ml-2 px-2 py-0.5 rounded-full text-xs font-bold"
-              style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}
-            >
+              style={{ background: "rgba(99,102,241,0.12)", color: "#818cf8" }}>
               {activeAlerts.length}
             </span>
           </h2>
@@ -408,8 +399,7 @@ export default function Alerts() {
             style={{
               background: "#0e0e10",
               border: "1px solid rgba(255,255,255,0.07)",
-            }}
-          >
+            }}>
             <ul role="list">
               {activeAlerts.map((alert, i) => (
                 <li
@@ -428,8 +418,7 @@ export default function Alerts() {
                   onMouseLeave={(e) => {
                     (e.currentTarget as HTMLLIElement).style.background =
                       "transparent";
-                  }}
-                >
+                  }}>
                   {/* Left */}
                   <div className="flex items-center gap-4">
                     <div
@@ -441,8 +430,7 @@ export default function Alerts() {
                         color: alert.active
                           ? "#818cf8"
                           : "rgba(255,255,255,0.25)",
-                      }}
-                    >
+                      }}>
                       <Bell size={17} strokeWidth={1.5} aria-hidden="true" />
                     </div>
                     <div>
@@ -462,8 +450,7 @@ export default function Alerts() {
                                   background: "rgba(239,68,68,0.1)",
                                   color: "#ef4444",
                                 }
-                          }
-                        >
+                          }>
                           {alert.condition}
                         </span>
                         {!alert.active && (
@@ -472,16 +459,14 @@ export default function Alerts() {
                             style={{
                               background: "rgba(255,255,255,0.06)",
                               color: "rgba(255,255,255,0.35)",
-                            }}
-                          >
+                            }}>
                             PAUSED
                           </span>
                         )}
                       </div>
                       <p
                         className="text-xs"
-                        style={{ color: "rgba(255,255,255,0.35)" }}
-                      >
+                        style={{ color: "rgba(255,255,255,0.35)" }}>
                         Target:{" "}
                         <span className="font-mono text-white font-medium">
                           {formatUSD(alert.targetPrice)}
@@ -494,9 +479,7 @@ export default function Alerts() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => toggleAlert(alert._id)}
-                      aria-label={
-                        alert.active ? "Pause alert" : "Resume alert"
-                      }
+                      aria-label={alert.active ? "Pause alert" : "Resume alert"}
                       aria-pressed={alert.active}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                       style={
@@ -519,8 +502,7 @@ export default function Alerts() {
                       onMouseLeave={(e) => {
                         (e.currentTarget as HTMLButtonElement).style.opacity =
                           "1";
-                      }}
-                    >
+                      }}>
                       {alert.active ? (
                         <ToggleRight
                           size={14}
@@ -556,8 +538,7 @@ export default function Alerts() {
                         el.style.background = "transparent";
                         el.style.color = "rgba(255,255,255,0.3)";
                         el.style.border = "1px solid rgba(255,255,255,0.08)";
-                      }}
-                    >
+                      }}>
                       <Trash2 size={13} strokeWidth={1.5} aria-hidden="true" />
                     </button>
                   </div>
@@ -574,16 +555,14 @@ export default function Alerts() {
           <div className="flex items-center justify-between mb-3">
             <h2
               className="text-sm font-semibold"
-              style={{ color: "rgba(255,255,255,0.5)" }}
-            >
+              style={{ color: "rgba(255,255,255,0.5)" }}>
               Triggered
               <span
                 className="ml-2 px-2 py-0.5 rounded-full text-xs font-bold"
                 style={{
                   background: "rgba(16,185,129,0.1)",
                   color: "#10b981",
-                }}
-              >
+                }}>
                 {triggeredAlerts.length}
               </span>
             </h2>
@@ -594,8 +573,7 @@ export default function Alerts() {
             style={{
               background: "#0e0e10",
               border: "1px solid rgba(255,255,255,0.07)",
-            }}
-          >
+            }}>
             <ul role="list">
               {triggeredAlerts.map((alert, i) => (
                 <li
@@ -617,16 +595,14 @@ export default function Alerts() {
                     (e.currentTarget as HTMLLIElement).style.opacity = "0.65";
                     (e.currentTarget as HTMLLIElement).style.background =
                       "transparent";
-                  }}
-                >
+                  }}>
                   <div className="flex items-center gap-4">
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                       style={{
                         background: "rgba(16,185,129,0.1)",
                         color: "#10b981",
-                      }}
-                    >
+                      }}>
                       <CheckCircle2
                         size={17}
                         strokeWidth={1.5}
@@ -643,15 +619,13 @@ export default function Alerts() {
                           style={{
                             background: "rgba(16,185,129,0.1)",
                             color: "#10b981",
-                          }}
-                        >
+                          }}>
                           TRIGGERED
                         </span>
                       </div>
                       <p
                         className="text-xs"
-                        style={{ color: "rgba(255,255,255,0.35)" }}
-                      >
+                        style={{ color: "rgba(255,255,255,0.35)" }}>
                         {alert.condition}{" "}
                         <span className="font-mono text-white font-medium">
                           {formatUSD(alert.targetPrice)}
@@ -662,7 +636,7 @@ export default function Alerts() {
                             <time dateTime={alert.notifiedAt}>
                               {format(
                                 parseISO(alert.notifiedAt),
-                                "MMM d, yyyy"
+                                "MMM d, yyyy",
                               )}
                             </time>
                           </span>
@@ -690,8 +664,7 @@ export default function Alerts() {
                       el.style.background = "transparent";
                       el.style.color = "rgba(255,255,255,0.3)";
                       el.style.border = "1px solid rgba(255,255,255,0.08)";
-                    }}
-                  >
+                    }}>
                     <Trash2 size={13} strokeWidth={1.5} aria-hidden="true" />
                   </button>
                 </li>
@@ -713,8 +686,7 @@ function AlertsSkeleton() {
       style={{
         background: "#0e0e10",
         border: "1px solid rgba(255,255,255,0.07)",
-      }}
-    >
+      }}>
       {[1, 2].map((i) => (
         <div
           key={i}
@@ -735,12 +707,10 @@ function EmptyAlerts() {
       style={{
         background: "#0e0e10",
         border: "1px solid rgba(255,255,255,0.07)",
-      }}
-    >
+      }}>
       <div
         className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto"
-        style={{ background: "rgba(99,102,241,0.1)" }}
-      >
+        style={{ background: "rgba(99,102,241,0.1)" }}>
         <Bell
           size={26}
           strokeWidth={1.5}

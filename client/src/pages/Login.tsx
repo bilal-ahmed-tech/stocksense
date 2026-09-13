@@ -177,7 +177,7 @@ export default function Login() {
           </h1>
           <p
             className="text-sm mb-8"
-            style={{ color: "rgba(255,255,255,0.4)" }}>
+            style={{ color: "var(--text-secondary)" }}>
             Sign in to your account to continue
           </p>
 
@@ -208,7 +208,7 @@ export default function Login() {
               <label
                 htmlFor="email"
                 className="text-xs font-semibold"
-                style={{ color: "rgba(255,255,255,0.5)" }}>
+                style={{ color: "var(--text-secondary)" }}>
                 Email address
               </label>
               <input
@@ -263,7 +263,7 @@ export default function Login() {
               <label
                 htmlFor="password"
                 className="text-xs font-semibold"
-                style={{ color: "rgba(255,255,255,0.5)" }}>
+                style={{ color: "var(--text-secondary)" }}>
                 Password
               </label>
               <div className="relative">

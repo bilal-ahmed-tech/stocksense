@@ -194,16 +194,16 @@ export default function Sidebar() {
               onClick={toggleSidebar}
               aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
               className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 ml-1 transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-              style={{ color: "rgba(255,255,255,0.2)" }}
+              style={{ color: "var(--text-muted)" }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLButtonElement;
                 el.style.background = "rgba(255,255,255,0.07)";
-                el.style.color = "rgba(255,255,255,0.7)";
+                el.style.color = "var(--text-primary)";
               }}
               onMouseLeave={(e) => {
                 const el = e.currentTarget as HTMLButtonElement;
                 el.style.background = "transparent";
-                el.style.color = "rgba(255,255,255,0.2)";
+                el.style.color = "var(--text-muted)";
               }}>
               {sidebarOpen ? (
                 <ChevronLeft size={13} strokeWidth={2} aria-hidden="true" />
@@ -219,7 +219,7 @@ export default function Sidebar() {
           {sidebarOpen && (
             <p
               className="text-[9px] font-bold uppercase tracking-[0.12em] px-3 pt-3 pb-1.5"
-              style={{ color: "rgba(255,255,255,0.18)" }}>
+              style={{ color: "var(--text-muted)" }}>
               Navigation
             </p>
           )}
@@ -245,14 +245,14 @@ export default function Sidebar() {
                           color: "#a5b4fc",
                           boxShadow: "inset 0 0 0 1px rgba(99,102,241,0.2)",
                         }
-                      : { color: "rgba(255,255,255,0.38)" }
+                      : { color: "var(--text-secondary)" }
                   }
                   onMouseEnter={(e) => {
                     if (!isActive) {
                       (e.currentTarget as HTMLSpanElement).style.background =
                         "rgba(255,255,255,0.05)";
                       (e.currentTarget as HTMLSpanElement).style.color =
-                        "rgba(255,255,255,0.75)";
+                        "var(--text-primary)";
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -260,7 +260,7 @@ export default function Sidebar() {
                       (e.currentTarget as HTMLSpanElement).style.background =
                         "transparent";
                       (e.currentTarget as HTMLSpanElement).style.color =
-                        "rgba(255,255,255,0.38)";
+                        "var(--text-secondary)";
                     }
                   }}>
                   {isActive && (
